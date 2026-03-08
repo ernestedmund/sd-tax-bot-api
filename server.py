@@ -43,8 +43,8 @@ app = FastAPI(title="SD County Property Tax Assistant")
 # Allow requests from your GitHub Pages domain
 # Change this to your actual GitHub Pages URL in production
 ALLOWED_ORIGINS = [
-    "ernestedmund.github.i",   # <- replace with your GitHub Pages URL
-    "http://localhost:8080",         # for local testing
+    "https://ernestedmund.github.io",
+    "http://localhost:8080",
 ]
 
 app.add_middleware(
