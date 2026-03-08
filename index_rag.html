@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>San Diego County Assessor — Property Tax Assistant</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #1a2744;
+    --navy-mid: #243358;
+    --navy-light: #2e4070;
+    --gold: #c9a84c;
+    --gold-light: #e8c97a;
+    --cream: #faf8f4;
+    --warm-white: #ffffff;
+    --gray-100: #f4f2ee;
+    --gray-200: #e8e4dc;
+    --gray-400: #9e9890;
+    --gray-600: #6b6560;
+    --gray-800: #3d3a35;
+    --shadow-sm: 0 1px 3px rgba(26,39,68,0.08), 0 1px 2px rgba(26,39,68,0.05);
+    --shadow-md: 0 4px 16px rgba(26,39,68,0.10), 0 2px 6px rgba(26,39,68,0.06);
+    --shadow-lg: 0 12px 40px rgba(26,39,68,0.14), 0 4px 12px rgba(26,39,68,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Source Sans 3', sans-serif; background: var(--cream); color: var(--gray-800); min-height: 100vh; display: flex; flex-direction: column; }
+  header { background: var(--navy); padding: 0; position: relative; overflow: hidden; }
+  header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%); opacity: 0.9; }
+  header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--gold), var(--gold-light), var(--gold), transparent); }
+  .header-inner { position: relative; max-width: 860px; margin: 0 auto; padding: 28px 32px 24px; display: flex; align-items: center; gap: 20px; }
+  .seal { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, var(--gold), var(--gold-light)); display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 2px 12px rgba(201,168,76,0.35); font-size: 22px; }
+  .header-text h1 { font-family: 'Playfair Display', serif; font-size: 1.45rem; font-weight: 600; color: #fff; line-height: 1.2; }
+  .header-text p { font-size: 0.82rem; color: rgba(255,255,255,0.62); margin-top: 3px; font-weight: 300; letter-spacing: 0.04em; text-transform: uppercase; }
+  .status-pill { margin-left: auto; background: rgba(45,122,79,0.25); border: 1px solid rgba(45,122,79,0.45); color: #7dd9a3; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 5px 12px; border-radius: 20px; display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #7dd9a3; animation: pulse 2s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.8); } }
+  main { flex: 1; max-width: 860px; width: 100%; margin: 0 auto; padding: 24px 32px 32px; display: flex; flex-direction: column; }
+  .topic-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; animation: fadeUp 0.4s ease both; }
+  .topic-chip { background: var(--warm-white); border: 1px solid var(--gray-200); color: var(--navy-mid); font-size: 0.78rem; font-weight: 500; padding: 6px 14px; border-radius: 20px; cursor: pointer; transition: all 0.18s ease; box-shadow: var(--shadow-sm); white-space: nowrap; }
+  .topic-chip:hover { background: var(--navy); color: white; border-color: var(--navy); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+  .chat-window { background: var(--warm-white); border-radius: 16px; box-shadow: var(--shadow-lg); border: 1px solid var(--gray-200); display: flex; flex-direction: column; overflow: hidden; min-height: 500px; animation: fadeUp 0.5s ease 0.1s both; }
+  .messages { flex: 1; overflow-y: auto; padding: 28px 28px 16px; display: flex; flex-direction: column; gap: 20px; min-height: 440px; max-height: 520px; scroll-behavior: smooth; }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 2px; }
+  .msg { display: flex; gap: 12px; animation: msgIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(10px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .msg.user { flex-direction: row-reverse; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; margin-top: 2px; }
+  .msg.bot .avatar { background: linear-gradient(135deg, var(--navy), var(--navy-light)); color: var(--gold-light); font-size: 16px; }
+  .msg.user .avatar { background: var(--gray-100); color: var(--gray-600); font-size: 13px; }
+  .bubble { max-width: 78%; padding: 14px 18px; border-radius: 16px; font-size: 0.92rem; line-height: 1.65; color: var(--gray-800); }
+  .msg.bot .bubble { background: var(--gray-100); border-bottom-left-radius: 4px; border: 1px solid var(--gray-200); }
+  .msg.user .bubble { background: var(--navy); color: rgba(255,255,255,0.95); border-bottom-right-radius: 4px; }
+  .bubble strong { font-weight: 600; color: var(--navy); }
+  .msg.user .bubble strong { color: var(--gold-light); }
+  .source-tag { display: inline-flex; align-items: center; gap: 5px; margin-top: 10px; font-size: 0.72rem; color: var(--gray-400); font-weight: 500; }
+  .source-tag::before { content: '\1F4CB'; font-size: 10px; }
+  .typing-indicator { display: flex; gap: 12px; align-items: center; }
+  .typing-dots { background: var(--gray-100); border: 1px solid var(--gray-200); border-radius: 16px; border-bottom-left-radius: 4px; padding: 14px 20px; display: flex; gap: 5px; align-items: center; }
+  .typing-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--gray-400); animation: typing 1.2s ease-in-out infinite; }
+  .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typing { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-5px); opacity: 1; } }
+  .input-area { padding: 16px 20px 20px; border-top: 1px solid var(--gray-200); background: var(--warm-white); }
+  .input-row { display: flex; gap: 10px; align-items: flex-end; }
+  .input-wrap { flex: 1; }
+  textarea { width: 100%; padding: 13px 16px; border: 1.5px solid var(--gray-200); border-radius: 12px; font-family: 'Source Sans 3', sans-serif; font-size: 0.92rem; line-height: 1.5; color: var(--gray-800); background: var(--cream); resize: none; outline: none; transition: border-color 0.2s, box-shadow 0.2s; min-height: 48px; max-height: 120px; overflow-y: auto; }
+  textarea:focus { border-color: var(--navy-light); box-shadow: 0 0 0 3px rgba(46,64,112,0.1); background: var(--warm-white); }
+  textarea::placeholder { color: var(--gray-400); }
+  .send-btn { width: 48px; height: 48px; border-radius: 12px; background: var(--navy); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.18s ease; flex-shrink: 0; }
+  .send-btn:hover:not(:disabled) { background: var(--navy-light); transform: translateY(-1px); }
+  .send-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+  .send-btn svg { width: 18px; height: 18px; fill: white; }
+  .input-hint { font-size: 0.72rem; color: var(--gray-400); margin-top: 8px; text-align: center; }
+  .disclaimer { background: linear-gradient(135deg, #fffbf0, #fff8e8); border: 1px solid rgba(201,168,76,0.3); border-radius: 10px; padding: 12px 16px; font-size: 0.78rem; color: var(--gray-600); line-height: 1.55; margin-top: 16px; display: flex; gap: 10px; align-items: flex-start; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 600px) { main { padding: 16px; } .header-inner { padding: 20px 16px; } .bubble { max-width: 88%; } .status-pill { display: none; } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="seal">&#9878;&#65039;</div>
+    <div class="header-text">
+      <h1>San Diego County Property Tax Assistant</h1>
+      <p>Assessor / Recorder / County Clerk</p>
+    </div>
+    <div class="status-pill"><div class="status-dot"></div>Available</div>
+  </div>
+</header>
+
+<main>
+  <div class="topic-bar">
+    <button class="topic-chip" onclick="askTopic('How does Prop 13 work?')">Prop 13 Basics</button>
+    <button class="topic-chip" onclick="askTopic('What triggers a change in ownership reassessment?')">Change in Ownership</button>
+    <button class="topic-chip" onclick="askTopic('What counts as new construction for tax purposes?')">New Construction</button>
+    <button class="topic-chip" onclick="askTopic('Why did I get a supplemental tax bill?')">Supplemental Bills</button>
+    <button class="topic-chip" onclick="askTopic('How do I apply for the Homeowners Exemption?')">Homeowners Exemption</button>
+    <button class="topic-chip" onclick="askTopic('What is the Disabled Veterans Exemption?')">Veterans Exemption</button>
+    <button class="topic-chip" onclick="askTopic('When are property taxes due?')">Billing &amp; Payments</button>
+    <button class="topic-chip" onclick="askTopic('How do I appeal my assessed value?')">Appeals</button>
+  </div>
+
+  <div class="chat-window">
+    <div class="messages" id="messages">
+      <div class="msg bot">
+        <div class="avatar">&#9878;&#65039;</div>
+        <div class="bubble">
+          <strong>Hello! I'm the San Diego County Property Tax Assistant.</strong><br><br>
+          I can answer questions about Proposition 13, assessed values, exemptions, supplemental bills, payment deadlines, appeals, and more.<br><br>
+          What can I help you with today?
+        </div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-row">
+        <div class="input-wrap">
+          <textarea id="userInput" placeholder="Ask a property tax question..." rows="1"></textarea>
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+        </button>
+      </div>
+      <div class="input-hint">Enter to send &nbsp;&middot;&nbsp; Shift+Enter for new line</div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <span>&#8505;&#65039;</span>
+    <span>This assistant provides general property tax information. It is not legal or tax advice. For questions about your specific property, contact the Assessor's office at <strong>(619) 236-3771</strong> or visit <strong>assessor.sandiegocounty.gov</strong>.</span>
+  </div>
+</main>
+
+<script>
+  // ---------------------------------------------------------------------------
+  // CONFIG — change API_BASE to wherever you deploy the FastAPI server
+  // ---------------------------------------------------------------------------
+  const API_BASE = 'https://YOUR-BACKEND-URL.azurewebsites.net';  // <- update this
+
+  // Generate a session ID once per page load (identifies conversation to server)
+  const SESSION_ID = crypto.randomUUID();
+
+  const messagesEl = document.getElementById('messages');
+  const inputEl    = document.getElementById('userInput');
+  const sendBtn    = document.getElementById('sendBtn');
+
+  // ---------------------------------------------------------------------------
+  // UI helpers
+  // ---------------------------------------------------------------------------
+  function scrollToBottom() {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+  }
+
+  inputEl.addEventListener('input', () => autoResize(inputEl));
+  inputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  function addMessage(role, content) {
+    const div    = document.createElement('div');
+    div.className = 'msg ' + role;
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    avatar.textContent = role === 'bot' ? '\u2696\uFE0F' : 'You';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+
+    if (role === 'bot') {
+      const sourceMatch = content.match(/Source:\s*(.+)$/m);
+      let main = content;
+      let src  = '';
+      if (sourceMatch) {
+        main = content.replace(sourceMatch[0], '').trim();
+        src  = '<div class="source-tag">' + sourceMatch[1] + '</div>';
+      }
+      main = main
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n\n/g, '<br><br>')
+        .replace(/\n/g, '<br>');
+      bubble.innerHTML = main + src;
+    } else {
+      bubble.textContent = content;
+    }
+
+    div.appendChild(avatar);
+    div.appendChild(bubble);
+    messagesEl.appendChild(div);
+    scrollToBottom();
+  }
+
+  function showTyping() {
+    const div = document.createElement('div');
+    div.className = 'typing-indicator';
+    div.id = 'typing';
+    const av = document.createElement('div');
+    av.className = 'avatar';
+    av.style.cssText = 'width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#1a2744,#2e4070);display:flex;align-items:center;justify-content:center;font-size:16px;color:#e8c97a;flex-shrink:0;';
+    av.textContent = '\u2696\uFE0F';
+    const dots = document.createElement('div');
+    dots.className = 'typing-dots';
+    dots.innerHTML = '<span></span><span></span><span></span>';
+    div.appendChild(av);
+    div.appendChild(dots);
+    messagesEl.appendChild(div);
+    scrollToBottom();
+  }
+
+  function hideTyping() {
+    const el = document.getElementById('typing');
+    if (el) el.remove();
+  }
+
+  // ---------------------------------------------------------------------------
+  // API call — talks to your FastAPI server, not Anthropic directly
+  // ---------------------------------------------------------------------------
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text || sendBtn.disabled) return;
+
+    inputEl.value = '';
+    inputEl.style.height = 'auto';
+    sendBtn.disabled = true;
+
+    addMessage('user', text);
+    showTyping();
+
+    try {
+      const res = await fetch(`${API_BASE}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: SESSION_ID, message: text })
+      });
+
+      hideTyping();
+
+      if (res.status === 429) {
+        addMessage('bot', "You've reached the question limit for this session. For more help, please call the Assessor's office at (619) 236-3771 or visit assessor.sandiegocounty.gov.");
+        return;
+      }
+
+      if (!res.ok) {
+        throw new Error(`Server error ${res.status}`);
+      }
+
+      const data = await res.json();
+      addMessage('bot', data.reply);
+
+    } catch (err) {
+      hideTyping();
+      addMessage('bot', "I'm having trouble connecting right now. Please try again in a moment, or contact the Assessor's office directly at (619) 236-3771.");
+    } finally {
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }
+  }
+
+  function askTopic(question) {
+    inputEl.value = question;
+    sendMessage();
+  }
+</script>
+</body>
+</html>
