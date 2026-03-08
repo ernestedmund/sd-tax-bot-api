@@ -15,12 +15,6 @@ import os
 from collections import Counter
 from anthropic import Anthropic
 
-# ---------------------------------------------------------------------------
-# 1. KNOWLEDGE BASE
-#    Each entry maps directly to a topic code in your existing KB.
-#    Format: { "id": "P13-001", "topic": "...", "content": "..." }
-# ---------------------------------------------------------------------------
-
 RAW_KNOWLEDGE_BASE = """
 ## P13-001 | Prop 13 Basics | What is Proposition 13?
 Proposition 13 is a California law passed by voters in 1978 that limits how much your property's taxable value can increase each year. When you buy a property or complete new construction, a "base year value" is set — and that value can only go up by a maximum of 2% per year, no matter what the real estate market does.
@@ -34,8 +28,8 @@ Source: BOE Publication 29 · P13-002
 The base property tax rate in California is 1% of your property's assessed value. However, your total tax bill is typically higher than 1% because it also includes voter-approved charges such as school bonds, Mello-Roos special taxes, and other local assessments that vary by location.
 Source: SD County Treasurer-Tax Collector · P13-003
 
-## P13-004 | Prop 13 Basics | Why did my assessed value go up?
-Each year the county may increase your assessed value by up to 2% for inflation. If it went up more than 2%, a Change in Ownership or new construction likely triggered a reassessment to current market value. You have the right to appeal if you believe the value is incorrect.
+## P13-004 | Prop 13 Basics | Why did my assessed value go up more than 2%?
+There are three reasons your assessed value could increase by more than 2%: (1) A Change in Ownership occurred, which triggers reassessment to current market value; (2) new construction was completed, which adds the market value of the new work; or (3) your property was previously under a Proposition 8 decline-in-value reduction, and as the market recovers, the assessed value can increase by more than 2% per year until it returns to the Prop 13 factored base year value. If none of these apply, contact the Assessor's office to review your account.
 Source: BOE Publication 29 · P13-004
 
 ## P13-005 | Prop 13 Basics | What triggers a reassessment to full market value?
@@ -143,7 +137,7 @@ The Homeowners Exemption reduces your assessed value by $7,000, saving most home
 Source: BOE Publication 2 · EX-HO-001
 
 ## EX-HO-002 | Homeowners Exemption | How do I apply for the Homeowners Exemption?
-File form BOE-266 with the San Diego County Assessor's office. Filing by February 15 gives the full exemption. Filing between February 16 and December 10 gives 80% for that year. The exemption renews automatically.
+File form BOE-266 with the San Diego County Assessor's office. Filing by February 15 gives the full exemption. Filing between February 16 and December 10 gives 80% of the exemption for that year. The exemption renews automatically once granted.
 Source: BOE Publication 2 · EX-HO-002
 
 ## EX-HO-003 | Homeowners Exemption | Who qualifies?
@@ -153,6 +147,10 @@ Source: BOE Publication 2 · EX-HO-003
 ## EX-HO-004 | Homeowners Exemption | I just bought a home. Do I need to apply?
 Yes. The exemption does not transfer automatically. File a new claim (BOE-266). The Assessor may mail you a form after your purchase records, but it is your responsibility to file.
 Source: BOE Publication 2 · EX-HO-004
+
+## EX-HO-005 | Homeowners Exemption | What if I move out or no longer qualify?
+You must notify the Assessor by filing an Advice of Termination. If you fail to do so and continue receiving the exemption, the county will remove it and may add a 25% penalty on the escaped tax value. Notify the Assessor promptly when your primary residence changes.
+Source: BOE Rule 135 · EX-HO-005
 
 ## EX-VET-DV-001 | Disabled Veterans Exemption | What is the Disabled Veterans Exemption?
 A significant property tax benefit for veterans with a service-connected disability or their surviving spouses. Two tiers: base exemption (approx. $161,083 assessed value reduction) and low-income exemption (approx. $241,627). Both amounts are adjusted annually by the BOE.
@@ -226,20 +224,111 @@ Source: BOE Publication 30 · APP-007
 If your property's current market value falls below its Prop 13 factored base year value, the county must temporarily reduce your assessed value to the lower market value. This is temporary — not a permanent change to your base year value.
 Source: BOE Publication 9 · P8-001
 
+## P8-002 | Prop 8 Reductions | How do I request a Prop 8 decline in value review?
+If you believe your property's market value as of January 1 is lower than your current assessed value, contact the San Diego County Assessor's office to request an informal review. San Diego County has a Decline in Value review form available online. You must request a review for the current assessment year only — you cannot apply retroactively for prior years. Call the Assessor at (619) 236-3771 or visit assessor.sandiegocounty.gov.
+Source: BOE Publication 800-10 · P8-002
+
+## P8-003 | Prop 8 Reductions | What evidence supports a Prop 8 review?
+Submit comparable sales — properties similar to yours that sold near January 1 of the tax year, in the same general location, with similar size and condition. A recent appraisal also works. The Assessor monitors market conditions and may reduce your value proactively, but you can initiate the process anytime. Only the most recent January 1 assessment may be reviewed.
+Source: BOE Publication 800-10 · P8-003
+
 ## P8-004 | Prop 8 Reductions | Will my taxes go back up when the market recovers?
 Yes. As the market recovers, your assessed value is restored up to the Prop 13 factored base year value — never above it. During recovery, your value can increase by more than 2% per year until it reaches the factored base year value.
 Source: BOE Publication 9 · P8-004
 
 ## P8-005 | Prop 8 Reductions | Can assessed value increase by more than 2% after a Prop 8 reduction?
-Yes. The standard 2% annual cap applies only when enrolled at the factored base year value. During recovery from a Prop 8 reduction, increases can exceed 2% per year until returning to the Prop 13 cap.
-Source: BOE Publication 9 · P8-005
+Yes. The standard 2% annual cap applies only when enrolled at the factored base year value. During recovery from a Prop 8 reduction, increases can exceed 2% per year until returning to the Prop 13 cap. Example: Property purchased at $450,000. Year 3, market drops to $350,000 — enrolled at $350,000 (Prop 8 reduction). Year 4, market recovers to $400,000 — enrolled at $400,000, a 14.3% increase. This is legal because the $400,000 is still below the Prop 13 factored base year value of approximately $477,000. Once market value reaches the factored base year value, the 2% cap resumes.
+Source: BOE Publication 800-10 · P8-005
+
+## P8-006 | Prop 8 Reductions | Can I formally appeal a Prop 8 determination?
+If the Assessor disagrees with your position on market value, file a formal Assessment Appeal with the Assessment Appeals Board. For a regular roll value, the filing window is July 2 through November 30. You must continue paying taxes during the appeal. If successful, you receive a refund for the overpaid amount. Contact the Clerk of the Board at (619) 531-5600 or file at clerkoftheboard.sdcounty.ca.gov.
+Source: BOE Publication 800-10 · P8-006
+
+## P19-001 | Proposition 19 | What is Proposition 19?
+Proposition 19 was approved by California voters on November 3, 2020. It made two major changes: (1) New rules for the parent-child and grandparent-grandchild exclusion from reassessment, effective February 16, 2021; and (2) expanded base year value transfer rights for homeowners age 55 or older, severely disabled persons, and victims of wildfire or natural disaster, effective April 1, 2021. Prop 19 significantly tightened the family transfer exclusion by requiring the property to be used as the recipient's primary residence.
+Source: BOE Publication 801 · P19-001
+
+## P19-002 | Proposition 19 | Parent-child exclusion — basic rules
+Under Prop 19 (effective February 16, 2021), a parent can transfer their primary residence to a child without triggering full reassessment — but only if the child moves in and makes it their primary residence within one year. The property must have been the parent's primary residence. Rentals, vacation homes, and investment properties no longer qualify. Transfers in either direction (parent to child or child to parent) are eligible.
+Source: BOE Publication 800-1 · P19-002
+
+## P19-003 | Proposition 19 | Parent-child exclusion — the $1 million value cap
+The child keeps the parent's factored base year value only if the property's current market value does not exceed the parent's factored base year value plus $1,000,000 (adjusted periodically by the California House Price Index). For transfers from February 16, 2025 through February 15, 2027, the adjusted cap is $1,044,586. If market value exceeds the cap, the difference is added to the transferred taxable value.
+Source: BOE Publication 800-1 · P19-003
+
+## P19-004 | Proposition 19 | Parent-child exclusion — value cap calculation example
+Example: Parent's factored base year value is $300,000. Market value at transfer is $1,500,000. Cap = $300,000 + $1,000,000 = $1,300,000. Market value exceeds cap by $200,000. Child's new taxable value = $300,000 + $200,000 = $500,000. Had market value been $1,100,000 (under cap), child would keep the $300,000 base unchanged and save approximately $8,000 per year.
+Source: BOE Publication 801 · P19-004
+
+## P19-005 | Proposition 19 | Parent-child exclusion — how to apply and deadlines
+File form BOE-19-P with the County Assessor where the property is located. File within three years of the transfer date, or within six months of a supplemental or escape assessment notice. The child must also file for the Homeowners Exemption (BOE-266) or Disabled Veterans Exemption (BOE-261-G) within one year of the transfer date to receive the exclusion retroactive to the date of transfer. If the exemption is filed after one year, the exclusion only applies going forward. Contact the Assessor at (619) 236-3771.
+Source: BOE Publication 800-1 · P19-005
+
+## P19-006 | Proposition 19 | Grandparent-grandchild exclusion
+Same rules as parent-child, but there is one additional requirement: the grandchild's parents who are children of the grandparent must be deceased before the transfer. The grandchild must move in as primary residence within one year. The same $1 million value cap applies. File form BOE-19-G with the County Assessor.
+Source: BOE Publication 800-2 · P19-006
+
+## P19-007 | Proposition 19 | Base year value transfer for seniors age 55 and older
+Homeowners age 55 or older can sell their principal residence and transfer its factored base year value to a replacement home anywhere in California. Can be used up to three times. The replacement must be purchased or newly constructed within two years of selling the original. Must be age 55 at time of selling the original. If married, only one spouse needs to be 55. File form BOE-19-B with the County Assessor where the replacement property is located. Effective April 1, 2021.
+Source: BOE Publication 800-3 · P19-007
+
+## P19-008 | Proposition 19 | Senior base year value transfer — buying a more expensive home
+You can buy a replacement of any value. If replacement costs more than original, the excess is added to your transferred base year value. Equal or lesser value thresholds: buying before you sell — replacement must be 100% or less of original sale price; buying within year 1 after selling — up to 105%; buying in year 2 — up to 110%. Beyond those thresholds the overage is added to your base year value.
+Source: BOE Publication 800-3 · P19-008
+
+## P19-009 | Proposition 19 | Base year value transfer for severely disabled persons
+Severely and permanently disabled persons of any age can transfer their base year value to a replacement home anywhere in California, up to three times. Requirements are the same as the senior transfer except disability replaces the age requirement. File forms BOE-19-D and BOE-19-DC (Certificate of Disability) with the County Assessor where the replacement is located.
+Source: BOE Publication 800-4 · P19-009
+
+## P19-010 | Proposition 19 | Base year value transfer for wildfire and natural disaster victims
+Property owners whose primary residence was substantially damaged (more than 50% of improvement value) by a Governor-declared wildfire or natural disaster can transfer their base year value to a replacement home anywhere in California, with no age requirement and no limit on number of uses. The replacement must be purchased or built within two years of the sale. File form BOE-19-V with the County Assessor where the replacement is located.
+Source: BOE Publication 801 · P19-010
+
+## P19-011 | Proposition 19 | What changed from the old parent-child exclusion?
+Before Prop 19, parents could transfer both their primary residence and up to $1 million of other real property (rentals, vacation homes, investment property) without reassessment, with no value cap and no move-in requirement. Prop 19 eliminated that broader exclusion for all transfers on or after February 16, 2021. Now only primary residences qualify, and the child must actually live there. Investment and rental properties transferred to children after February 15, 2021 are fully reassessed.
+Source: BOE Publication 800-1 · P19-011
+
+## P19-012 | Proposition 19 | I inherited my parent's house — what do I need to do and when?
+Time is critical. The date of death is the date of Change in Ownership — even if the property is still in trust or probate. You have one year from the date of death to move in and file for the Homeowners or Disabled Veterans Exemption to get the exclusion retroactive to the date of death. File form BOE-19-P within three years of the date of death. Also file form BOE-502-D (Change in Ownership Statement — Death of Real Property Owner) within 150 days of death. Call the Assessor at (619) 236-3771 as soon as possible.
+Source: BOE Publication 800-9 · P19-012
+
+## P19-013 | Proposition 19 | Can I buy my replacement home before I sell my original?
+Yes. You can purchase or build the replacement first and sell the original afterward — as long as both transactions occur within two years of each other. The base year value transfer applies as of the date the original is sold. If you buy before selling, the equal-or-lesser-value threshold is 100% of the original's eventual sale price. Note: the transfer is not finalized until the original actually sells, so taxes on the replacement will initially be based on its purchase price and will be adjusted — with a refund if applicable — once the original sells and the claim is processed.
+Source: BOE Rule 462.540 · P19-013
+
+## P19-014 | Proposition 19 | Does the parent-child exclusion apply to family farms?
+Yes. Under Prop 19 / Rule 462.520, the intergenerational transfer exclusion applies not only to a principal residence but also to a family farm — defined as land under cultivation, used for pasture or grazing, or used to produce agricultural commodities. The farm does not need to include a residence to qualify. The eligible transferee (child or grandchild) does not need to live on the farm, but must continue to use it as a family farm. If the property stops being used as a family farm by an eligible transferee, the exclusion is removed and the assessed value reverts to market value. File form BOE-19-P (parent-child) or BOE-19-G (grandparent-grandchild) with the County Assessor.
+Source: BOE Rule 462.520 · P19-014
+
+## P19-015 | Proposition 19 | What happens if my child moves out after inheriting my home under Prop 19?
+The exclusion is lost. If the child stops using the inherited property as their primary residence, the intergenerational transfer exclusion is removed. The assessed value will then be based on the full market value that was established at the time of the original transfer, adjusted for inflation — not the low base year value the parent had. There is a one-year grace period: if another eligible transferee (such as a sibling who also qualifies) moves in within one year, the exclusion can be preserved. Callers should be aware that renting out the property, even temporarily, triggers removal of the exclusion.
+Source: BOE Rule 462.520 · P19-015
+
+## DEATH-001 | Death of Property Owner | What happens to property taxes when a property owner dies?
+The death of a property owner is a Change in Ownership under California law, occurring as of the date of death — even if the property remains in trust or probate. This may trigger reassessment to market value unless an exclusion applies: transfers to a surviving spouse or registered domestic partner are automatic (no form required); Prop 19 parent-child and grandparent-grandchild exclusions require a form and have deadlines; the cotenant exclusion applies to qualifying co-owners.
+Source: BOE Publication 800-9 · DEATH-001
+
+## DEATH-002 | Death of Property Owner | What forms do I need to file when a property owner dies?
+File form BOE-502-D (Change in Ownership Statement — Death of Real Property Owner) with the County Assessor within 150 days of the date of death. If the estate is in probate, file before or at the time the inventory and appraisal are filed with the court. This form notifies the Assessor and alerts you to any exclusion claim forms that also need to be filed, such as BOE-19-P (parent-child) or BOE-58-H (cotenant).
+Source: BOE Publication 800-9 · DEATH-002
+
+## DEATH-003 | Death of Property Owner | My parent left me their house in a trust. Do I still need to act quickly?
+Yes — do not wait. Even if the property is in a trust, the date of death is the date of Change in Ownership for property tax purposes, not the date of distribution or deed transfer. The one-year clock to move in and file for the Homeowners Exemption starts at the date of death. If you miss the one-year window, you lose the ability to get the Prop 19 exclusion retroactive to the date of death.
+Source: BOE Publication 800-9 · DEATH-003
+
+## DEATH-004 | Death of Property Owner | Cotenant exclusion for co-owners who are not spouses
+If two people (other than spouses or registered domestic partners) owned and lived together in a home as their primary residence for at least one year, and one dies, the surviving co-owner may qualify for the Cotenant Exclusion from reassessment. The surviving cotenant must inherit 100% of the property and sign an affidavit of continuous co-occupancy. File form BOE-58-H with the County Assessor. Applies to siblings, non-registered domestic partners, friends, or other co-owners.
+Source: BOE Publication 800-8 · DEATH-004
+
+## SR-001 | Senior Assistance | Property Tax Postponement Program for seniors age 62+
+The California State Controller offers a Property Tax Postponement Program for homeowners age 62 or older. Qualifying homeowners can defer current-year property taxes on their primary residence — the State Controller pays the tax directly to the county on your behalf. Requirements: at least 40% equity in the home and annual household income below the program limit (approximately $49,000; check sco.ca.gov for the current year limit). Deferred taxes accrue interest and must be repaid when the home is sold, the owner moves out, or the owner dies without a qualifying successor.
+Source: BOE Publication 800-5 · SR-001
+
+## SR-002 | Senior Assistance | Payment plan for delinquent property taxes
+If property taxes have been delinquent for less than five years, the County Tax Collector offers a five-year Permanent Installment Plan. At enrollment, pay 20% of the outstanding amount plus a processing fee; the remaining 80% is paid in equal installments over four years. Interest accrues at 1.5% per month (18% per year) on the unpaid balance. You must stay current on future annual tax bills to remain in good standing. Contact the Treasurer-Tax Collector at (877) 829-4732.
+Source: BOE Publication 800-5 · SR-002
 """
 
-
-# ---------------------------------------------------------------------------
-# 2. CHUNK PARSER
-#    Parses the raw KB string into structured chunk dicts.
-# ---------------------------------------------------------------------------
 
 def parse_knowledge_base(raw: str) -> list[dict]:
     chunks = []
@@ -266,41 +355,26 @@ def parse_knowledge_base(raw: str) -> list[dict]:
     return chunks
 
 
-# ---------------------------------------------------------------------------
-# 3. TF-IDF RETRIEVER
-#    No external API needed. For production, swap with:
-#    - OpenAI text-embedding-3-small  (~$0.00002 per query, excellent quality)
-#    - sentence-transformers/all-MiniLM-L6-v2  (free, runs locally)
-#    - Azure OpenAI embedding endpoint (if county has Azure contract)
-# ---------------------------------------------------------------------------
-
 def tokenize(text: str) -> list[str]:
     return re.findall(r'[a-z]+', text.lower())
 
 def build_tfidf_index(chunks: list[dict]) -> dict:
-    """Build TF-IDF vectors for each chunk."""
     corpus = []
     for c in chunks:
         text = f"{c['topic']} {c['question']} {c['content']}"
         corpus.append(tokenize(text))
-
-    # Document frequency
     df = Counter()
     for doc in corpus:
         for term in set(doc):
             df[term] += 1
-
     N = len(corpus)
     idf = {term: math.log(N / freq) for term, freq in df.items()}
-
-    # TF-IDF vectors (sparse dicts)
     vectors = []
     for doc in corpus:
         tf = Counter(doc)
         total = len(doc)
         vec = {term: (count / total) * idf.get(term, 0) for term, count in tf.items()}
         vectors.append(vec)
-
     return {"vectors": vectors, "idf": idf}
 
 def cosine_similarity(a: dict, b: dict) -> float:
@@ -313,22 +387,15 @@ def cosine_similarity(a: dict, b: dict) -> float:
     return dot / (mag_a * mag_b) if mag_a and mag_b else 0.0
 
 def retrieve(query: str, chunks: list[dict], index: dict, top_k: int = 4) -> list[dict]:
-    """Return the top_k most relevant chunks for a query."""
     idf = index["idf"]
     q_tokens = tokenize(query)
     tf = Counter(q_tokens)
     total = len(q_tokens)
     q_vec = {term: (count / total) * idf.get(term, 0) for term, count in tf.items()}
-
     scores = [cosine_similarity(q_vec, v) for v in index["vectors"]]
     ranked = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)
     return [chunks[i] for i in ranked[:top_k] if scores[i] > 0]
 
-
-# ---------------------------------------------------------------------------
-# 4. PROMPT BUILDER
-#    Only the retrieved chunks go to the model — not the full KB.
-# ---------------------------------------------------------------------------
 
 SYSTEM_BASE = """You are the San Diego County Property Tax Assistant. You help residents understand property taxes using only the provided reference material.
 
@@ -343,24 +410,13 @@ Rules:
 def build_system_prompt(retrieved_chunks: list[dict]) -> str:
     if not retrieved_chunks:
         return SYSTEM_BASE + "\n\nNo relevant reference material found for this query."
-
     refs = "\n\n---\n\n".join(
         f"[{c['id']}] {c['topic']} — {c['question']}\n{c['content']}\nSource: {c['source']}"
         for c in retrieved_chunks
     )
     return f"{SYSTEM_BASE}\n\n=== REFERENCE MATERIAL ===\n\n{refs}"
 
-
-# ---------------------------------------------------------------------------
-# 5. CHAT LOOP
-#    Maintains conversation history. Each turn:
-#    - retrieves relevant chunks for the NEW user message
-#    - rebuilds the system prompt with only those chunks
-#    - calls Claude Haiku (cheapest capable model)
-# ---------------------------------------------------------------------------
-
 def estimate_tokens(text: str) -> int:
-    """Very rough token estimate: ~4 chars per token."""
     return len(text) // 4
 
 def chat():
@@ -384,11 +440,8 @@ def chat():
         if not user_input:
             continue
 
-        # Retrieve relevant chunks for this specific question
         retrieved = retrieve(user_input, chunks, index, top_k=4)
         system_prompt = build_system_prompt(retrieved)
-
-        # Log what was retrieved (remove in production)
         chunk_ids = [c["id"] for c in retrieved]
         est_system_tokens = estimate_tokens(system_prompt)
         print(f"\n[RAG] Retrieved: {chunk_ids} | ~{est_system_tokens} system tokens")
@@ -405,11 +458,9 @@ def chat():
         reply = response.content[0].text
         history.append({"role": "assistant", "content": reply})
 
-        # Token tracking
         session_input_tokens += response.usage.input_tokens
         session_output_tokens += response.usage.output_tokens
 
-        # Haiku pricing: $0.80/M input, $4.00/M output (as of 2025)
         cost = (session_input_tokens * 0.80 + session_output_tokens * 4.00) / 1_000_000
         print(f"\nAssistant: {reply}")
         print(f"\n[Tokens this session: {session_input_tokens} in / {session_output_tokens} out | Est. cost: ${cost:.5f}]")
