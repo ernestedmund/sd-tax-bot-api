@@ -124,20 +124,58 @@ You are answering a phone call, so follow these rules strictly:
 - End your answer with a natural closing like "Does that help?" or "Anything else I can answer for you?"
 """
 
+EXPANSION_PROMPT = """You are a query rewriter for a property tax assistant.
+Given a conversation history and a short follow-up message, rewrite the follow-up as a single clear, standalone question that captures the user's full intent.
+Output ONLY the rewritten question — no explanation, no preamble."""
+
+def expand_query(message: str, history: list[dict]) -> str:
+    """
+    If the message is a short follow-up, rewrite it as a full standalone
+    question using conversation context. Falls back to original if no history
+    or if the message is already detailed enough.
+    """
+    # Only expand if message is short and there is prior context
+    if len(message.split()) > 10 or not history:
+        return message
+
+    # Build a compact history string (last 2 turns only)
+    recent = history[-4:]
+    history_text = "\n".join(
+        f"{'User' if m['role'] == 'user' else 'Assistant'}: {m['content'][:200]}"
+        for m in recent
+    )
+
+    response = client.messages.create(
+        model="claude-haiku-4-5-20251001",
+        max_tokens=60,
+        system=EXPANSION_PROMPT,
+        messages=[{
+            "role": "user",
+            "content": f"Conversation so far:\n{history_text}\n\nFollow-up message: {message}"
+        }]
+    )
+    expanded = response.content[0].text.strip()
+    print(f"[query expansion] '{message}' -> '{expanded}'")
+    return expanded if expanded else message
+
+
 def get_rag_reply(message: str, history: list[dict], voice: bool = False) -> tuple[str, list[str]]:
     """Run RAG retrieval and call Claude. Returns (reply, chunk_ids)."""
-    retrieved = retrieve(message, KB_CHUNKS, KB_INDEX, top_k=4)
+    # Expand short follow-up queries using conversation context
+    retrieval_query = expand_query(message, history)
+
+    retrieved = retrieve(retrieval_query, KB_CHUNKS, KB_INDEX, top_k=4)
     system_prompt = build_system_prompt(retrieved)
     if voice:
         system_prompt = system_prompt + VOICE_SYSTEM_ADDENDUM
     chunk_ids = [c["id"] for c in retrieved]
 
     trimmed_history = history[-(MAX_HISTORY_TURNS * 2):]
-    trimmed_history.append({"role": "user", "content": message})
+    trimmed_history.append({"role": "user", "content": message})  # use original message in history
 
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=300,  # shorter for voice
+        max_tokens=300 if voice else 600,
         system=system_prompt,
         messages=trimmed_history,
     )
