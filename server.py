@@ -115,10 +115,21 @@ class ChatResponse(BaseModel):
 # Shared RAG + Claude helper (used by both /chat and /gather)
 # ---------------------------------------------------------------------------
 
-def get_rag_reply(message: str, history: list[dict]) -> tuple[str, list[str]]:
+VOICE_SYSTEM_ADDENDUM = """
+You are answering a phone call, so follow these rules strictly:
+- Respond in plain spoken English only. No bullet points, numbered lists, headers, or markdown.
+- Keep your answer to 3 sentences or fewer. Be concise — the caller is listening, not reading.
+- Never read out source citations, rule numbers, form names, or publication references.
+- If a phone number is needed, speak it naturally: "call six one nine, two three six, three seven seven one".
+- End your answer with a natural closing like "Does that help?" or "Anything else I can answer for you?"
+"""
+
+def get_rag_reply(message: str, history: list[dict], voice: bool = False) -> tuple[str, list[str]]:
     """Run RAG retrieval and call Claude. Returns (reply, chunk_ids)."""
     retrieved = retrieve(message, KB_CHUNKS, KB_INDEX, top_k=4)
     system_prompt = build_system_prompt(retrieved)
+    if voice:
+        system_prompt = system_prompt + VOICE_SYSTEM_ADDENDUM
     chunk_ids = [c["id"] for c in retrieved]
 
     trimmed_history = history[-(MAX_HISTORY_TURNS * 2):]
@@ -126,7 +137,7 @@ def get_rag_reply(message: str, history: list[dict]) -> tuple[str, list[str]]:
 
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=600,
+        max_tokens=300,  # shorter for voice
         system=system_prompt,
         messages=trimmed_history,
     )
@@ -171,21 +182,16 @@ async def chat(req: ChatRequest, request: Request):
 # Endpoints — Twilio voice
 # ---------------------------------------------------------------------------
 
-VOICE = "Polly.Joanna"          # AWS Polly via Twilio — clear, neutral US English
+VOICE = "Polly.Ruth-Neural"     # AWS Polly Neural via Twilio — natural US English
 GATHER_TIMEOUT = 5              # seconds of silence before Twilio stops listening
 GATHER_SPEECH_TIMEOUT = "auto"  # Twilio auto-detects end of speech
 
 GREETING = (
-    "Hello, and thank you for calling the San Diego County Property Tax Assistant. "
-    "You can ask me questions about property tax bills, exemptions, Proposition 13, "
-    "assessed values, or payment deadlines. "
-    "Please ask your question after the tone."
+    "Hi, you've reached the San Diego County Property Tax Assistant. "
+    "What's your property tax question?"
 )
 
-NO_INPUT = (
-    "I didn't catch that. Please ask your question after the tone, "
-    "or press zero to be transferred to the Assessor's office."
-)
+NO_INPUT = "I didn't catch that. Go ahead and ask your question."
 
 TRANSFER_NUMBER = "+16192363771"  # SD County Assessor
 
@@ -263,7 +269,7 @@ async def gather(request: Request):
     # Run RAG + Claude
     history = sessions.get(call_sid, [])
     try:
-        reply, chunk_ids = get_rag_reply(speech_result, history)
+        reply, chunk_ids = get_rag_reply(speech_result, history, voice=True)
         print(f"[{call_sid}] Q: {speech_result[:80]}")
         print(f"[{call_sid}] Chunks: {chunk_ids}")
         print(f"[{call_sid}] A: {reply[:120]}")
@@ -292,8 +298,7 @@ async def gather(request: Request):
     )
     gather.say(reply, voice=VOICE)
     gather.say(
-        "Do you have another question? Please ask after the tone, "
-        "or press zero to speak with someone at the Assessor's office.",
+        "Any other questions?",
         voice=VOICE,
     )
     vr.append(gather)
