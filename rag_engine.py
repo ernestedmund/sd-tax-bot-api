@@ -21,7 +21,7 @@ Proposition 13 is a California law passed by voters in 1978 that limits how much
 Source: BOE Publication 29 · P13-001
 
 ## P13-002 | Prop 13 Basics | What is a base year value?
-Your base year value is the taxable value assigned to your property when it is purchased or when new construction is completed. For a purchase, it is generally equal to the sale price. This becomes the starting point for your property taxes, and it can only increase by up to 2% per year going forward.
+Your base year value is the taxable value assigned to your property when it is purchased or when new construction is completed. For a purchase, it is generally equal to the sale price — provided the sale was an arm's-length transaction between an unrelated buyer and seller. The Assessor validates each sale; if the sale price reflects distressed conditions (foreclosure, short sale, auction, or a purchase from a family member or friend), the enrolled value may differ from what you paid. This becomes the starting point for your property taxes, and it can only increase by up to 2% per year going forward.
 Source: BOE Publication 29 · P13-002
 
 ## P13-003 | Prop 13 Basics | What is the property tax rate in San Diego County?
@@ -45,11 +45,11 @@ Market value is what your property would sell for today. Assessed value is what 
 Source: BOE Publication 29 · P13-007
 
 ## P13-008 | Prop 13 Basics | I just bought a home. How will taxes be calculated?
-Your purchase price becomes your new base year value. Annual tax is approximately 1% of that value plus local charges. Assessed value can only increase by up to 2% per year going forward unless you make significant improvements or the property changes ownership again.
+Your purchase price is used to establish your new base year value, provided it reflects an arm's-length sale between an unrelated buyer and seller. The Assessor validates the transaction — in a typical open-market sale the purchase price is enrolled as-is, but foreclosures, short sales, auctions, or purchases from family may be assessed at an independently determined market value instead. Annual tax is approximately 1% of the base year value plus local charges, and it can only increase by up to 2% per year going forward unless you make significant improvements or the property changes ownership again.
 Source: BOE Publication 29 · P13-008
 
 ## CIO-001 | Change in Ownership | What is a Change in Ownership?
-A Change in Ownership (CIO) is a transfer of property that causes the county to reassess it at current market value. The new market value becomes the new base year value, subject to Prop 13 rules going forward. This can significantly increase taxes if market value has risen.
+A Change in Ownership (CIO) is a transfer of property that causes the county to reassess it at current market value. The new market value becomes the new base year value, subject to Prop 13 rules going forward. This can significantly increase taxes if market value has risen. Note: the Assessor determines market value independently — in a standard arm's-length sale the purchase price is typically enrolled, but distressed sales, foreclosures, or non-arm's-length transfers may be assessed at a value the Assessor determines separately.
 Source: BOE Publication 150-C · CIO-001
 
 ## CIO-002 | Change in Ownership | What events trigger a Change in Ownership?
@@ -83,6 +83,14 @@ Source: BOE Publication 150-C · CIO-008
 ## CIO-010 | Change in Ownership | What is a Preliminary Change of Ownership Report (PCOR)?
 A PCOR (form BOE-502-A) must be filed with the county recorder whenever real property is transferred. It helps the Assessor determine whether reassessment applies or an exclusion exists. Failure to file may result in a $20 fee.
 Source: BOE Publication 4 · CIO-010
+
+## CIO-011 | Change in Ownership | Will my foreclosure or distressed sale price be my new assessed value?
+Not necessarily. While purchase price is generally presumed to equal market value in an arm's-length sale, the Assessor must validate each transaction. For foreclosures, short sales, auctions, REO purchases, and purchases from family members or friends, the sale price may not reflect open-market conditions — one or more elements of a fair market value transaction may be missing. In those cases the Assessor may enroll a value higher or lower than what you paid, based on an independent market analysis. If you believe the enrolled value is incorrect, you can request an informal review or file a formal appeal. Call the Assessor at (619) 236-3771.
+Source: BOE Property Tax Rule 2 · CIO-011
+
+## RC-001 | Roll Corrections | There is an error on my assessment — can it be fixed?
+Yes. If there is a factual error on your assessment roll — such as a wrong property size, incorrect owner name, or a clerical mistake — the Assessor can correct it after the roll has been delivered to the Auditor, generally within four years of the assessment being made. Errors involving a decline in value that was not properly reflected must be corrected within one year. If a correction increases your taxes, the Assessor must notify you and explain the review process. If it decreases your taxes, the Board of Supervisors must consent. To report an error, contact the San Diego County Assessor at (619) 236-3771 or visit assessor.sandiegocounty.gov.
+Source: BOE Property Tax Rule 263 · RC-001
 
 ## NC-001 | New Construction | What counts as new construction for property tax purposes?
 New construction includes any addition of a new structure, expansion of an existing structure, and any conversion requiring a building permit. Only the newly constructed portion is reassessed — the rest retains its existing base year value.
