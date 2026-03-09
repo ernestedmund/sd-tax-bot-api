@@ -372,12 +372,15 @@ async def websocket_handler(websocket: WebSocket):
 
             event = msg.get("type") or msg.get("event", "")
 
+            # Debug: log every incoming message so we can see exact field names
+            print(f"[relay debug] event='{event}' keys={list(msg.keys())} raw={json.dumps(msg)[:400]}")
+
             if event == "setup":
                 call_sid = msg.get("callSid") or msg.get("CallSid", "unknown")
                 print(f"[relay] Connected: {call_sid}")
 
             elif event == "prompt":
-                utterance = (msg.get("voicePrompt") or msg.get("speech", "")).strip()
+                utterance = (msg.get("voicePrompt") or msg.get("speech", "") or msg.get("text", "")).strip()
                 if not utterance:
                     continue
 
@@ -401,14 +404,15 @@ async def websocket_handler(websocket: WebSocket):
                     {"role": "assistant", "content": reply},
                 ])[-(MAX_HISTORY_TURNS * 2):]
 
-                await websocket.send_text(json.dumps({"type": "text", "token": reply}))
+                await websocket.send_text(json.dumps({"type": "text", "token": reply, "last": True}))
 
             elif event == "dtmf":
                 digit = msg.get("digit", "")
                 if digit == "0":
                     await websocket.send_text(json.dumps({
                         "type": "text",
-                        "token": "Transferring you now. Please hold."
+                        "token": "Transferring you now. Please hold.",
+                        "last": True
                     }))
                     await websocket.send_text(json.dumps({"type": "end"}))
 
