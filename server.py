@@ -327,8 +327,11 @@ async def voice_relay(request: Request):
     call_sid = form.get("CallSid", "unknown")
     sessions.pop(call_sid, None)
 
-    host = request.headers.get("host", "")
+    # Railway automatically sets RAILWAY_PUBLIC_DOMAIN — use it for the websocket URL
+    # so Twilio gets the correct public hostname, not an internal Railway address
+    host = os.environ.get("RAILWAY_PUBLIC_DOMAIN") or request.headers.get("host", "")
     ws_url = f"wss://{host}/ws"
+    print(f"[relay] WebSocket URL: {ws_url}")
 
     vr = VoiceResponse()
     connect = Connect()
