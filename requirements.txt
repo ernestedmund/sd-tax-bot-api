@@ -4,3 +4,4 @@ anthropic==0.40.0
 pydantic==2.10.3
 twilio==9.4.0
 python-multipart==0.0.9
+websockets==12.0
