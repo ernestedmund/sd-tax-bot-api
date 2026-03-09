@@ -2,34 +2,30 @@
 SD County Property Tax Assistant - FastAPI Backend
 ===================================================
 Wraps rag_engine.py as a REST API.
-The GitHub Pages frontend calls POST /chat with the user message;
-this server does retrieval and calls Claude Haiku, returning only the reply.
 
-Your Anthropic API key stays server-side — never exposed to the browser.
-
-Twilio voice routes added:
-  POST /voice  — entry point for inbound calls (greet + gather speech)
-  POST /gather — receives transcribed speech, runs RAG, speaks answer, loops
-
-Deploy options for SD County:
-  - Azure App Service (likely already in your IT contract)
-  - AWS Lambda + API Gateway (very cheap for this traffic volume)
-  - Any Linux VM or container behind county firewall
+Endpoints:
+  GET  /health        — health check
+  POST /chat          — web chatbot (GitHub Pages frontend)
+  POST /voice         — legacy Twilio voice (Say/Gather, kept as fallback)
+  POST /gather        — legacy Twilio gather handler
+  POST /voice_relay   — ConversationRelay entry point (new primary voice bot)
+  WS   /ws            — ConversationRelay websocket handler (ElevenLabs TTS)
 
 Run locally:
-  pip install fastapi uvicorn anthropic twilio
+  pip install fastapi uvicorn anthropic twilio websockets python-multipart
   ANTHROPIC_API_KEY=sk-... uvicorn server:app --reload
 """
 
 import os
+import json
 import time
 from collections import defaultdict
-from fastapi import FastAPI, HTTPException, Request, Form
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from pydantic import BaseModel
 from anthropic import Anthropic
-from twilio.twiml.voice_response import VoiceResponse, Gather
+from twilio.twiml.voice_response import VoiceResponse, Gather, Connect
 
 # Import RAG components from rag_engine.py (same directory)
 from rag_engine import (
@@ -68,8 +64,7 @@ print(f"Loaded {len(KB_CHUNKS)} knowledge base chunks at startup.")
 
 
 # ---------------------------------------------------------------------------
-# Rate limiting — simple in-memory (swap for Redis in production)
-# Limits: 15 questions per IP per hour
+# Rate limiting
 # ---------------------------------------------------------------------------
 
 RATE_LIMIT_WINDOW = 3600
@@ -90,7 +85,7 @@ def check_rate_limit(ip: str):
 
 
 # ---------------------------------------------------------------------------
-# Session store — shared by both web chat and phone sessions
+# Session store
 # ---------------------------------------------------------------------------
 
 sessions: dict[str, list[dict]] = {}
@@ -98,7 +93,7 @@ MAX_HISTORY_TURNS = 6
 
 
 # ---------------------------------------------------------------------------
-# Request / Response models (web chat)
+# Request / Response models
 # ---------------------------------------------------------------------------
 
 class ChatRequest(BaseModel):
@@ -112,13 +107,13 @@ class ChatResponse(BaseModel):
 
 
 # ---------------------------------------------------------------------------
-# Shared RAG + Claude helper (used by both /chat and /gather)
+# Shared RAG + Claude helpers
 # ---------------------------------------------------------------------------
 
 VOICE_SYSTEM_ADDENDUM = """
 You are answering a phone call, so follow these rules strictly:
 - Respond in plain spoken English only. No bullet points, numbered lists, headers, or markdown.
-- Keep your answer to 3 sentences or fewer. Be concise — the caller is listening, not reading.
+- Keep your answer to 3 sentences or fewer. Be concise -- the caller is listening, not reading.
 - Never read out source citations, rule numbers, form names, or publication references.
 - If a phone number is needed, speak it naturally: "call six one nine, two three six, three seven seven one".
 - End your answer with a natural closing like "Does that help?" or "Anything else I can answer for you?"
@@ -126,19 +121,12 @@ You are answering a phone call, so follow these rules strictly:
 
 EXPANSION_PROMPT = """You are a query rewriter for a property tax assistant.
 Given a conversation history and a short follow-up message, rewrite the follow-up as a single clear, standalone question that captures the user's full intent.
-Output ONLY the rewritten question — no explanation, no preamble."""
+Output ONLY the rewritten question -- no explanation, no preamble."""
 
 def expand_query(message: str, history: list[dict]) -> str:
-    """
-    If the message is a short follow-up, rewrite it as a full standalone
-    question using conversation context. Falls back to original if no history
-    or if the message is already detailed enough.
-    """
-    # Only expand if message is short and there is prior context
     if len(message.split()) > 10 or not history:
         return message
 
-    # Build a compact history string (last 2 turns only)
     recent = history[-4:]
     history_text = "\n".join(
         f"{'User' if m['role'] == 'user' else 'Assistant'}: {m['content'][:200]}"
@@ -160,10 +148,7 @@ def expand_query(message: str, history: list[dict]) -> str:
 
 
 def get_rag_reply(message: str, history: list[dict], voice: bool = False) -> tuple[str, list[str]]:
-    """Run RAG retrieval and call Claude. Returns (reply, chunk_ids)."""
-    # Expand short follow-up queries using conversation context
     retrieval_query = expand_query(message, history)
-
     retrieved = retrieve(retrieval_query, KB_CHUNKS, KB_INDEX, top_k=4)
     system_prompt = build_system_prompt(retrieved)
     if voice:
@@ -171,7 +156,7 @@ def get_rag_reply(message: str, history: list[dict], voice: bool = False) -> tup
     chunk_ids = [c["id"] for c in retrieved]
 
     trimmed_history = history[-(MAX_HISTORY_TURNS * 2):]
-    trimmed_history.append({"role": "user", "content": message})  # use original message in history
+    trimmed_history.append({"role": "user", "content": message})
 
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
@@ -183,7 +168,7 @@ def get_rag_reply(message: str, history: list[dict], voice: bool = False) -> tup
 
 
 # ---------------------------------------------------------------------------
-# Endpoints — web chat
+# Endpoints -- web chat
 # ---------------------------------------------------------------------------
 
 @app.get("/health")
@@ -217,21 +202,18 @@ async def chat(req: ChatRequest, request: Request):
 
 
 # ---------------------------------------------------------------------------
-# Endpoints — Twilio voice
+# Endpoints -- legacy Twilio voice (Say/Gather fallback)
 # ---------------------------------------------------------------------------
 
-VOICE = "Google.en-US-Chirp3-HD-Leda"  # Google Chirp3-HD generative — most natural available on Twilio
-GATHER_TIMEOUT = 5              # seconds of silence before Twilio stops listening
-GATHER_SPEECH_TIMEOUT = "auto"  # Twilio auto-detects end of speech
-
-GREETING = (
+LEGACY_VOICE = "Google.en-US-Chirp3-HD-Leda"
+GATHER_TIMEOUT = 5
+GATHER_SPEECH_TIMEOUT = "auto"
+GREETING_LEGACY = (
     "Hi, you've reached the San Diego County Property Tax Assistant. "
     "What's your property tax question?"
 )
-
 NO_INPUT = "I didn't catch that. Go ahead and ask your question."
-
-TRANSFER_NUMBER = "+16192363771"  # SD County Assessor
+TRANSFER_NUMBER = "+16192363771"
 
 
 def twiml_response(twiml: VoiceResponse) -> Response:
@@ -240,16 +222,8 @@ def twiml_response(twiml: VoiceResponse) -> Response:
 
 @app.post("/voice")
 async def voice_entry(request: Request):
-    """
-    Twilio calls this when a call comes in.
-    Greet the caller and open a speech gather.
-    CallSid is used as the session key so conversation history persists
-    across turns within the same call.
-    """
     form = await request.form()
     call_sid = form.get("CallSid", "unknown")
-
-    # Clear any old session for this CallSid (fresh call)
     sessions.pop(call_sid, None)
 
     vr = VoiceResponse()
@@ -261,21 +235,14 @@ async def voice_entry(request: Request):
         speech_timeout=GATHER_SPEECH_TIMEOUT,
         language="en-US",
     )
-    gather.say(GREETING, voice=VOICE)
+    gather.say(GREETING_LEGACY, voice=LEGACY_VOICE)
     vr.append(gather)
-
-    # If caller says nothing at all, loop back
     vr.redirect("/voice", method="POST")
-
     return twiml_response(vr)
 
 
 @app.post("/gather")
-async def gather(request: Request):
-    """
-    Twilio posts here with SpeechResult (transcribed caller speech).
-    Run RAG + Claude, speak the answer, then loop back for another question.
-    """
+async def gather_handler(request: Request):
     form = await request.form()
     call_sid = form.get("CallSid", "unknown")
     speech_result = (form.get("SpeechResult") or "").strip()
@@ -283,15 +250,13 @@ async def gather(request: Request):
 
     vr = VoiceResponse()
 
-    # Caller pressed 0 — transfer to Assessor's office
     if digits == "0":
-        vr.say("Transferring you now. Please hold.", voice=VOICE)
+        vr.say("Transferring you now. Please hold.", voice=LEGACY_VOICE)
         vr.dial(TRANSFER_NUMBER)
         return twiml_response(vr)
 
-    # No speech captured
     if not speech_result:
-        gather = Gather(
+        g = Gather(
             input="speech dtmf",
             action="/gather",
             method="POST",
@@ -299,34 +264,31 @@ async def gather(request: Request):
             speech_timeout=GATHER_SPEECH_TIMEOUT,
             language="en-US",
         )
-        gather.say(NO_INPUT, voice=VOICE)
-        vr.append(gather)
+        g.say(NO_INPUT, voice=LEGACY_VOICE)
+        vr.append(g)
         vr.redirect("/voice", method="POST")
         return twiml_response(vr)
 
-    # Run RAG + Claude
     history = sessions.get(call_sid, [])
     try:
         reply, chunk_ids = get_rag_reply(speech_result, history, voice=True)
-        print(f"[{call_sid}] Q: {speech_result[:80]}")
-        print(f"[{call_sid}] Chunks: {chunk_ids}")
-        print(f"[{call_sid}] A: {reply[:120]}")
+        print(f"[legacy {call_sid}] Q: {speech_result[:80]}")
+        print(f"[legacy {call_sid}] Chunks: {chunk_ids}")
+        print(f"[legacy {call_sid}] A: {reply[:120]}")
     except Exception as e:
-        print(f"[{call_sid}] Error: {e}")
+        print(f"[legacy {call_sid}] Error: {e}")
         reply = (
             "I'm sorry, I had trouble looking that up. "
             "Please call the Assessor's office directly at 619-236-3771."
         )
 
-    # Update session history
     updated_history = history + [
         {"role": "user", "content": speech_result},
         {"role": "assistant", "content": reply},
     ]
     sessions[call_sid] = updated_history[-(MAX_HISTORY_TURNS * 2):]
 
-    # Speak the answer, then gather the next question
-    gather = Gather(
+    g = Gather(
         input="speech dtmf",
         action="/gather",
         method="POST",
@@ -334,12 +296,126 @@ async def gather(request: Request):
         speech_timeout=GATHER_SPEECH_TIMEOUT,
         language="en-US",
     )
-    gather.say(reply, voice=VOICE)
-    gather.say(
-        "Any other questions?",
-        voice=VOICE,
-    )
-    vr.append(gather)
+    g.say(reply, voice=LEGACY_VOICE)
+    g.say("Any other questions?", voice=LEGACY_VOICE)
+    vr.append(g)
     vr.redirect("/voice", method="POST")
-
     return twiml_response(vr)
+
+
+# ---------------------------------------------------------------------------
+# Endpoints -- ConversationRelay (ElevenLabs TTS via websocket)
+# ---------------------------------------------------------------------------
+
+ELEVENLABS_VOICE_ID = "EST9Ui6982FZPSi7gCHi"
+VOICE_SETTINGS = "0.9_0.75_0.75"   # speed_stability_similarity
+ELEVENLABS_VOICE = f"{ELEVENLABS_VOICE_ID}-{VOICE_SETTINGS}"
+
+GREETING_RELAY = (
+    "Hi, you've reached the San Diego County Property Tax Assistant. "
+    "What's your property tax question?"
+)
+
+
+@app.post("/voice_relay")
+async def voice_relay(request: Request):
+    """
+    ConversationRelay entry point. Returns TwiML that hands the call off
+    to a websocket, which drives the live conversation with ElevenLabs TTS.
+    """
+    form = await request.form()
+    call_sid = form.get("CallSid", "unknown")
+    sessions.pop(call_sid, None)
+
+    host = request.headers.get("host", "")
+    ws_url = f"wss://{host}/ws"
+
+    vr = VoiceResponse()
+    connect = Connect()
+    connect.conversation_relay(
+        url=ws_url,
+        tts_provider="ElevenLabs",
+        voice=ELEVENLABS_VOICE,
+        language="en-US",
+        transcription_provider="deepgram",
+        speech_model="nova-2",
+        welcome_greeting=GREETING_RELAY,
+    )
+    vr.append(connect)
+    return twiml_response(vr)
+
+
+@app.websocket("/ws")
+async def websocket_handler(websocket: WebSocket):
+    """
+    ConversationRelay websocket handler.
+
+    Twilio sends JSON messages:
+      setup    -- call metadata, extract CallSid
+      prompt   -- transcribed caller speech, run RAG + Claude, reply with text
+      interrupt-- caller interrupted, log only
+      dtmf     -- keypad digit
+
+    We reply with JSON:
+      {"type": "text", "token": "<reply text>"}   -- Twilio speaks via ElevenLabs
+      {"type": "end"}                              -- hang up / end relay
+    """
+    await websocket.accept()
+    call_sid = "unknown"
+
+    try:
+        async for raw in websocket.iter_text():
+            try:
+                msg = json.loads(raw)
+            except json.JSONDecodeError:
+                continue
+
+            event = msg.get("type") or msg.get("event", "")
+
+            if event == "setup":
+                call_sid = msg.get("callSid") or msg.get("CallSid", "unknown")
+                print(f"[relay] Connected: {call_sid}")
+
+            elif event == "prompt":
+                utterance = (msg.get("voicePrompt") or msg.get("speech", "")).strip()
+                if not utterance:
+                    continue
+
+                print(f"[relay {call_sid}] Q: {utterance[:80]}")
+                history = sessions.get(call_sid, [])
+
+                try:
+                    reply, chunk_ids = get_rag_reply(utterance, history, voice=True)
+                    print(f"[relay {call_sid}] Chunks: {chunk_ids}")
+                    print(f"[relay {call_sid}] A: {reply[:120]}")
+                except Exception as e:
+                    print(f"[relay {call_sid}] RAG error: {e}")
+                    reply = (
+                        "I'm sorry, I had trouble looking that up. "
+                        "Please call the Assessor's office directly at "
+                        "619-236-3771."
+                    )
+
+                sessions[call_sid] = (history + [
+                    {"role": "user", "content": utterance},
+                    {"role": "assistant", "content": reply},
+                ])[-(MAX_HISTORY_TURNS * 2):]
+
+                await websocket.send_text(json.dumps({"type": "text", "token": reply}))
+
+            elif event == "dtmf":
+                digit = msg.get("digit", "")
+                if digit == "0":
+                    await websocket.send_text(json.dumps({
+                        "type": "text",
+                        "token": "Transferring you now. Please hold."
+                    }))
+                    await websocket.send_text(json.dumps({"type": "end"}))
+
+            elif event == "interrupt":
+                print(f"[relay {call_sid}] Interrupted")
+
+    except WebSocketDisconnect:
+        print(f"[relay {call_sid}] Disconnected")
+    except Exception as e:
+        print(f"[relay {call_sid}] Error: {e}")
