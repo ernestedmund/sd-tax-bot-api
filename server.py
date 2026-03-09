@@ -182,7 +182,7 @@ async def chat(req: ChatRequest, request: Request):
 # Endpoints — Twilio voice
 # ---------------------------------------------------------------------------
 
-VOICE = "Google.en-US-Studio-O"  # Google Studio Neural — most natural Twilio-native TTS
+VOICE = "Google.en-US-Chirp3-HD-Leda"  # Google Chirp3-HD generative — most natural available on Twilio
 GATHER_TIMEOUT = 5              # seconds of silence before Twilio stops listening
 GATHER_SPEECH_TIMEOUT = "auto"  # Twilio auto-detects end of speech
 
