@@ -182,7 +182,7 @@ async def chat(req: ChatRequest, request: Request):
 # Endpoints — Twilio voice
 # ---------------------------------------------------------------------------
 
-VOICE = "Polly.Ruth-Neural"     # AWS Polly Neural via Twilio — natural US English
+VOICE = "Google.en-US-Studio-O"  # Google Studio Neural — most natural Twilio-native TTS
 GATHER_TIMEOUT = 5              # seconds of silence before Twilio stops listening
 GATHER_SPEECH_TIMEOUT = "auto"  # Twilio auto-detects end of speech
 
