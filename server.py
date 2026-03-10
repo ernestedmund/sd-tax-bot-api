@@ -40,7 +40,7 @@ from rag_engine import (
 # Setup
 # ---------------------------------------------------------------------------
 
-app = FastAPI(title="SD County Property Tax Assistant")
+app = FastAPI(title="County Property Tax Assistant")
 
 ALLOWED_ORIGINS = [
     "https://ernestedmund.github.io",
@@ -79,7 +79,7 @@ def check_rate_limit(ip: str):
     if len(ip_request_log[ip]) >= RATE_LIMIT_MAX:
         raise HTTPException(
             status_code=429,
-            detail="Rate limit reached. Please try again later or call (619) 236-3771."
+            detail="Rate limit reached. Please try again later or contact your county assessor's office."
         )
     ip_request_log[ip].append(now)
 
@@ -209,11 +209,11 @@ LEGACY_VOICE = "Google.en-US-Chirp3-HD-Leda"
 GATHER_TIMEOUT = 5
 GATHER_SPEECH_TIMEOUT = "auto"
 GREETING_LEGACY = (
-    "Hi, you've reached the San Diego County Property Tax Assistant. "
+    "Hi, you've reached the County Property Tax Assistant. "
     "What's your property tax question?"
 )
 NO_INPUT = "I didn't catch that. Go ahead and ask your question."
-TRANSFER_NUMBER = "+16192363771"
+TRANSFER_NUMBER = ""  # Set to your county assessor's number
 
 
 def twiml_response(twiml: VoiceResponse) -> Response:
@@ -279,7 +279,7 @@ async def gather_handler(request: Request):
         print(f"[legacy {call_sid}] Error: {e}")
         reply = (
             "I'm sorry, I had trouble looking that up. "
-            "Please call the Assessor's office directly at 619-236-3771."
+            "Please contact your county assessor's office directly for assistance."
         )
 
     updated_history = history + [
@@ -312,7 +312,7 @@ VOICE_SETTINGS = "0.9_0.75_0.75"   # speed_stability_similarity
 ELEVENLABS_VOICE = f"{ELEVENLABS_VOICE_ID}-{VOICE_SETTINGS}"
 
 GREETING_RELAY = (
-    "Hi, you've reached the San Diego County Property Tax Assistant. "
+    "Hi, you've reached the County Property Tax Assistant. "
     "What's your property tax question?"
 )
 
@@ -400,8 +400,7 @@ async def websocket_handler(websocket: WebSocket):
                     print(f"[relay {call_sid}] RAG error: {e}")
                     reply = (
                         "I'm sorry, I had trouble looking that up. "
-                        "Please call the Assessor's office directly at "
-                        "619-236-3771."
+                        "Please contact your county assessor's office directly for assistance."
                     )
 
                 sessions[call_sid] = (history + [
