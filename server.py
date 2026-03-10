@@ -113,10 +113,10 @@ class ChatResponse(BaseModel):
 VOICE_SYSTEM_ADDENDUM = """
 You are answering a phone call, so follow these rules strictly:
 - Respond in plain spoken English only. No bullet points, numbered lists, headers, or markdown.
-- Keep your answer to 3 sentences or fewer. Be concise -- the caller is listening, not reading.
+- Keep your answer to 2 to 3 sentences. Be concise -- the caller is listening, not reading.
 - Never read out source citations, rule numbers, form names, or publication references.
 - If a phone number is needed, speak it naturally: "call six one nine, two three six, three seven seven one".
-- End your answer with a natural closing like "Does that help?" or "Anything else I can answer for you?"
+- Never end with a standalone closing sentence. Instead, trail your final answer sentence into an invitation for more questions using a comma and a short tag like "...or let me know if you have another question" or "...or feel free to ask anything else."
 """
 
 EXPANSION_PROMPT = """You are a query rewriter for a property tax assistant.
@@ -323,8 +323,10 @@ async def voice_relay(request: Request):
     ConversationRelay entry point. Returns TwiML that hands the call off
     to a websocket, which drives the live conversation with ElevenLabs TTS.
     """
+    print("[voice_relay] Incoming call received")
     form = await request.form()
     call_sid = form.get("CallSid", "unknown")
+    print(f"[voice_relay] CallSid={call_sid}")
     sessions.pop(call_sid, None)
 
     # Railway automatically sets RAILWAY_PUBLIC_DOMAIN — use it for the websocket URL
