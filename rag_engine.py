@@ -1,6 +1,6 @@
 """
-County Property Tax Assistant - RAG Engine
-==========================================
+SD County Property Tax Assistant - RAG Engine
+=============================================
 Chunks the knowledge base, builds a TF-IDF vector index (no external
 embedding API needed), retrieves relevant chunks at query time, and
 calls Claude Haiku with only those chunks.
@@ -24,12 +24,12 @@ Source: BOE Publication 29 · P13-001
 Your base year value is the taxable value assigned to your property when it is purchased or when new construction is completed. For a purchase, it is generally equal to the sale price — provided the sale was an arm's-length transaction between an unrelated buyer and seller. The Assessor validates each sale; if the sale price reflects distressed conditions (foreclosure, short sale, auction, or a purchase from a family member or friend), the enrolled value may differ from what you paid. This becomes the starting point for your property taxes, and it can only increase by up to 2% per year going forward.
 Source: BOE Publication 29 · P13-002
 
-## P13-003 | Prop 13 Basics | What is the property tax rate in California?
+## P13-003 | Prop 13 Basics | What is the property tax rate in San Diego County?
 The base property tax rate in California is 1% of your property's assessed value. However, your total tax bill is typically higher than 1% because it also includes voter-approved charges such as school bonds, Mello-Roos special taxes, and other local assessments that vary by location.
-Source: BOE Publication 29 · P13-003
+Source: SD County Treasurer-Tax Collector · P13-003
 
 ## P13-004 | Prop 13 Basics | Why did my assessed value go up more than 2%?
-There are three reasons your assessed value could increase by more than 2%: (1) A Change in Ownership occurred, which triggers reassessment to current market value; (2) new construction was completed, which adds the market value of the new work; or (3) your property was previously under a Proposition 8 decline-in-value reduction, and as the market recovers, the assessed value can increase by more than 2% per year until it returns to the Prop 13 factored base year value. If none of these apply, contact your county Assessor's office to review your account.
+There are three reasons your assessed value could increase by more than 2%: (1) A Change in Ownership occurred, which triggers reassessment to current market value; (2) new construction was completed, which adds the market value of the new work; or (3) your property was previously under a Proposition 8 decline-in-value reduction, and as the market recovers, the assessed value can increase by more than 2% per year until it returns to the Prop 13 factored base year value. If none of these apply, contact the Assessor's office to review your account.
 Source: BOE Publication 29 · P13-004
 
 ## P13-005 | Prop 13 Basics | What triggers a reassessment to full market value?
@@ -85,11 +85,11 @@ A PCOR (form BOE-502-A) must be filed with the county recorder whenever real pro
 Source: BOE Publication 4 · CIO-010
 
 ## CIO-011 | Change in Ownership | Will my foreclosure or distressed sale price be my new assessed value?
-Not necessarily. While purchase price is generally presumed to equal market value in an arm's-length sale, the Assessor must validate each transaction. For foreclosures, short sales, auctions, REO purchases, and purchases from family members or friends, the sale price may not reflect open-market conditions — one or more elements of a fair market value transaction may be missing. In those cases the Assessor may enroll a value higher or lower than what you paid, based on an independent market analysis. If you believe the enrolled value is incorrect, you can request an informal review or file a formal appeal with your county Assessor's office.
+Not necessarily. While purchase price is generally presumed to equal market value in an arm's-length sale, the Assessor must validate each transaction. For foreclosures, short sales, auctions, REO purchases, and purchases from family members or friends, the sale price may not reflect open-market conditions — one or more elements of a fair market value transaction may be missing. In those cases the Assessor may enroll a value higher or lower than what you paid, based on an independent market analysis. If you believe the enrolled value is incorrect, you can request an informal review or file a formal appeal. Call the Assessor at (619) 236-3771.
 Source: BOE Property Tax Rule 2 · CIO-011
 
 ## RC-001 | Roll Corrections | There is an error on my assessment — can it be fixed?
-Yes. If there is a factual error on your assessment roll — such as a wrong property size, incorrect owner name, or a clerical mistake — the Assessor can correct it after the roll has been delivered to the Auditor, generally within four years of the assessment being made. Errors involving a decline in value that was not properly reflected must be corrected within one year. If a correction increases your taxes, the Assessor must notify you and explain the review process. If it decreases your taxes, the Board of Supervisors must consent. To report an error, contact your county Assessor's office.
+Yes. If there is a factual error on your assessment roll — such as a wrong property size, incorrect owner name, or a clerical mistake — the Assessor can correct it after the roll has been delivered to the Auditor, generally within four years of the assessment being made. Errors involving a decline in value that was not properly reflected must be corrected within one year. If a correction increases your taxes, the Assessor must notify you and explain the review process. If it decreases your taxes, the Board of Supervisors must consent. To report an error, contact the San Diego County Assessor at (619) 236-3771 or visit assessor.sandiegocounty.gov.
 Source: BOE Property Tax Rule 263 · RC-001
 
 ## NC-001 | New Construction | What counts as new construction for property tax purposes?
@@ -137,7 +137,7 @@ No. Your regular annual bill covers the full fiscal year and is typically paid t
 Source: BOE Publication 26 · SUP-006
 
 ## SUP-007 | Supplemental Assessments | What if my supplemental assessment is too high?
-You have the right to appeal. The deadline is 60 days from the date of the Notice of Supplemental Assessment — shorter than the regular roll appeal window. Contact your county Assessment Appeals Board to file.
+You have the right to appeal. The deadline is 60 days from the date of the Notice of Supplemental Assessment — shorter than the regular roll appeal window. Contact the Assessment Appeals Board at (619) 531-5600.
 Source: BOE Publication 26 · SUP-007
 
 ## EX-HO-001 | Homeowners Exemption | What is the Homeowners Exemption?
@@ -145,7 +145,7 @@ The Homeowners Exemption reduces your assessed value by $7,000, saving most home
 Source: BOE Publication 2 · EX-HO-001
 
 ## EX-HO-002 | Homeowners Exemption | How do I apply for the Homeowners Exemption?
-File form BOE-266 with your county Assessor's office. Filing by February 15 gives the full exemption. Filing between February 16 and December 10 gives 80% of the exemption for that year. The exemption renews automatically once granted.
+File form BOE-266 with the San Diego County Assessor's office. Filing by February 15 gives the full exemption. Filing between February 16 and December 10 gives 80% of the exemption for that year. The exemption renews automatically once granted.
 Source: BOE Publication 2 · EX-HO-002
 
 ## EX-HO-003 | Homeowners Exemption | Who qualifies?
@@ -169,7 +169,7 @@ Veterans honorably discharged with a 100% service-connected VA disability rating
 Source: BOE Publication 149 · EX-VET-DV-002
 
 ## EX-VET-DV-004 | Disabled Veterans Exemption | How do I apply?
-File form BOE-261-G with your county Assessor's office, along with your DD-214 and VA disability rating letter. For the low-income tier, include income documentation. Must be renewed annually by February 15.
+File form BOE-261-G with the San Diego County Assessor's office, along with your DD-214 and VA disability rating letter. For the low-income tier, include income documentation. Must be renewed annually by February 15.
 Source: BOE Publication 149 · EX-VET-DV-004
 
 ## EX-VET-DV-005 | Disabled Veterans Exemption | Does it need to be renewed every year?
@@ -181,24 +181,24 @@ Reduces assessed value by $4,000 (approx. $40/year savings). Available to vetera
 Source: BOE Publication 1 · EX-VET-B-001
 
 ## EX-VET-B-003 | Basic Veterans Exemption | How do I apply?
-File form BOE-261 with your county Assessor's office along with your DD-214. File by February 15 for the full exemption. Renews automatically once granted.
+File form BOE-261 with the San Diego County Assessor's office along with your DD-214. File by February 15 for the full exemption. Renews automatically once granted.
 Source: BOE Publication 1 · EX-VET-B-003
 
 ## BILL-001 | Billing and Payments | When are property tax bills mailed?
-California county property tax bills are typically mailed in late October, covering the full fiscal year July 1 through June 30.
-Source: BOE Publication 29 · BILL-001
+San Diego County property tax bills are mailed in late October, covering the full fiscal year July 1 through June 30.
+Source: SD County Treasurer-Tax Collector · BILL-001
 
 ## BILL-002 | Billing and Payments | When are property taxes due?
 Two installments: First installment due November 1, delinquent after December 10. Second installment due February 1, delinquent after April 10. Both can be paid upfront if preferred.
-Source: BOE Publication 29 · BILL-002
+Source: SD County Treasurer-Tax Collector · BILL-002
 
 ## BILL-003 | Billing and Payments | What happens if I miss a deadline?
 A 10% penalty is added. If the second installment is not paid by June 30, the property becomes tax-defaulted with an additional $33 redemption fee. After five years of non-payment, the property may be subject to the county tax sale process.
-Source: BOE Publication 29 · BILL-003
+Source: SD County Treasurer-Tax Collector · BILL-003
 
 ## BILL-004 | Billing and Payments | How can I pay my property taxes?
-Online, by phone, by mail, or in person at your county Tax Collector's office. Check your county Tax Collector's website for specific payment options, addresses, and contact information.
-Source: BOE Publication 29 · BILL-004
+Online at sdttc.com (free e-check, or credit/debit card with convenience fee), by phone, by mail, or in person at 1600 Pacific Highway, Room 162, San Diego, CA 92101. Call (877) 829-4732.
+Source: SD County Treasurer-Tax Collector · BILL-004
 
 ## BILL-009 | Billing and Payments | What is Mello-Roos?
 Mello-Roos is a special tax for properties within a Community Facilities District (CFD), funding infrastructure like schools and roads. It appears as a separate line item on your bill and is not based on assessed value.
@@ -206,7 +206,7 @@ Source: BOE Publication 29 · BILL-009
 
 ## BILL-010 | Billing and Payments | Can I get a penalty waived?
 Only in very limited circumstances: documented medical emergency, natural disaster, or county error. Financial hardship alone is not sufficient. You must pay the full amount including penalty first, then submit a penalty cancellation request with documentation to the Treasurer-Tax Collector.
-Source: BOE Publication 29 · BILL-010
+Source: SD County Treasurer-Tax Collector · BILL-010
 
 ## APP-001 | Assessment Appeals | What is an assessment appeal?
 A formal process to challenge the assessed value assigned to your property. If you believe your assessed value exceeds market value, you can appeal to the Assessment Appeals Board — an independent body separate from the Assessor. A successful appeal can reduce your taxes.
@@ -221,8 +221,8 @@ Regular roll: July 2 through November 30 of the assessment year. Supplemental as
 Source: BOE Publication 30 · APP-003
 
 ## APP-004 | Assessment Appeals | How do I file an appeal?
-Submit an Application for Changed Assessment to your county Clerk of the Board of Supervisors. There is typically a filing fee. You must continue paying taxes on time during the appeal to avoid penalties. Contact your county Assessment Appeals Board for local filing instructions.
-Source: BOE Publication 30 · APP-004
+Submit an Application for Changed Assessment to the San Diego County Clerk of the Board of Supervisors. There is a filing fee. You must continue paying taxes on time during the appeal to avoid penalties. Contact (619) 531-5600.
+Source: SD County Clerk of the Board · APP-004
 
 ## APP-007 | Assessment Appeals | Do I keep paying taxes while my appeal is pending?
 Yes. Filing an appeal does not suspend your payment obligation. If your appeal succeeds and the assessed value is reduced, you will receive a refund for any overpayment, with interest in some cases.
@@ -233,7 +233,7 @@ If your property's current market value falls below its Prop 13 factored base ye
 Source: BOE Publication 9 · P8-001
 
 ## P8-002 | Prop 8 Reductions | How do I request a Prop 8 decline in value review?
-If you believe your property's market value as of January 1 is lower than your current assessed value, contact your county Assessor's office to request an informal review. Most counties have a Decline in Value review form available online or at the office. You must request a review for the current assessment year only — you cannot apply retroactively for prior years.
+If you believe your property's market value as of January 1 is lower than your current assessed value, contact the San Diego County Assessor's office to request an informal review. San Diego County has a Decline in Value review form available online. You must request a review for the current assessment year only — you cannot apply retroactively for prior years. Call the Assessor at (619) 236-3771 or visit assessor.sandiegocounty.gov.
 Source: BOE Publication 800-10 · P8-002
 
 ## P8-003 | Prop 8 Reductions | What evidence supports a Prop 8 review?
@@ -249,7 +249,7 @@ Yes. The standard 2% annual cap applies only when enrolled at the factored base 
 Source: BOE Publication 800-10 · P8-005
 
 ## P8-006 | Prop 8 Reductions | Can I formally appeal a Prop 8 determination?
-If the Assessor disagrees with your position on market value, file a formal Assessment Appeal with your county Assessment Appeals Board. For a regular roll value, the filing window is July 2 through November 30. You must continue paying taxes during the appeal. If successful, you receive a refund for the overpaid amount.
+If the Assessor disagrees with your position on market value, file a formal Assessment Appeal with the Assessment Appeals Board. For a regular roll value, the filing window is July 2 through November 30. You must continue paying taxes during the appeal. If successful, you receive a refund for the overpaid amount. Contact the Clerk of the Board at (619) 531-5600 or file at clerkoftheboard.sdcounty.ca.gov.
 Source: BOE Publication 800-10 · P8-006
 
 ## P19-001 | Proposition 19 | What is Proposition 19?
@@ -269,7 +269,7 @@ Example: Parent's factored base year value is $300,000. Market value at transfer
 Source: BOE Publication 801 · P19-004
 
 ## P19-005 | Proposition 19 | Parent-child exclusion — how to apply and deadlines
-File form BOE-19-P with the County Assessor where the property is located. File within three years of the transfer date, or within six months of a supplemental or escape assessment notice. The child must also file for the Homeowners Exemption (BOE-266) or Disabled Veterans Exemption (BOE-261-G) within one year of the transfer date to receive the exclusion retroactive to the date of transfer. If the exemption is filed after one year, the exclusion only applies going forward. Contact your county Assessor's office for assistance.
+File form BOE-19-P with the County Assessor where the property is located. File within three years of the transfer date, or within six months of a supplemental or escape assessment notice. The child must also file for the Homeowners Exemption (BOE-266) or Disabled Veterans Exemption (BOE-261-G) within one year of the transfer date to receive the exclusion retroactive to the date of transfer. If the exemption is filed after one year, the exclusion only applies going forward. Contact the Assessor at (619) 236-3771.
 Source: BOE Publication 800-1 · P19-005
 
 ## P19-006 | Proposition 19 | Grandparent-grandchild exclusion
@@ -297,7 +297,7 @@ Before Prop 19, parents could transfer both their primary residence and up to $1
 Source: BOE Publication 800-1 · P19-011
 
 ## P19-012 | Proposition 19 | I inherited my parent's house — what do I need to do and when?
-Time is critical. The date of death is the date of Change in Ownership — even if the property is still in trust or probate. You have one year from the date of death to move in and file for the Homeowners or Disabled Veterans Exemption to get the exclusion retroactive to the date of death. File form BOE-19-P within three years of the date of death. Also file form BOE-502-D (Change in Ownership Statement — Death of Real Property Owner) within 150 days of death. Contact your county Assessor's office as soon as possible.
+Time is critical. The date of death is the date of Change in Ownership — even if the property is still in trust or probate. You have one year from the date of death to move in and file for the Homeowners or Disabled Veterans Exemption to get the exclusion retroactive to the date of death. File form BOE-19-P within three years of the date of death. Also file form BOE-502-D (Change in Ownership Statement — Death of Real Property Owner) within 150 days of death. Call the Assessor at (619) 236-3771 as soon as possible.
 Source: BOE Publication 800-9 · P19-012
 
 ## P19-013 | Proposition 19 | Can I buy my replacement home before I sell my original?
@@ -333,10 +333,146 @@ The California State Controller offers a Property Tax Postponement Program for h
 Source: BOE Publication 800-5 · SR-001
 
 ## SR-002 | Senior Assistance | Payment plan for delinquent property taxes
-If property taxes have been delinquent for less than five years, the County Tax Collector typically offers a five-year Permanent Installment Plan. At enrollment, pay 20% of the outstanding amount plus a processing fee; the remaining 80% is paid in equal installments over four years. Interest accrues at 1.5% per month (18% per year) on the unpaid balance. You must stay current on future annual tax bills to remain in good standing. Contact your county Treasurer-Tax Collector for details.
+If property taxes have been delinquent for less than five years, the County Tax Collector offers a five-year Permanent Installment Plan. At enrollment, pay 20% of the outstanding amount plus a processing fee; the remaining 80% is paid in equal installments over four years. Interest accrues at 1.5% per month (18% per year) on the unpaid balance. You must stay current on future annual tax bills to remain in good standing. Contact the Treasurer-Tax Collector at (877) 829-4732.
 Source: BOE Publication 800-5 · SR-002
-"""
 
+
+## CAL-001 | Calamity Relief | My property was damaged by a fire or natural disaster. Can my taxes be reduced?
+Yes. Under California Revenue and Taxation Code Section 170, if your property suffers damage or destruction of $10,000 or more due to a calamity  -  such as fire, flood, earthquake, or mudslide  -  you may apply for a temporary reduction in assessed value. The reduction reflects the loss in value caused by the damage. You must file a calamity relief claim with your county Assessor within 12 months of the date of damage. Once the property is rebuilt or repaired to its pre-damage condition, the assessed value is restored  -  but the base year value is not changed, so your long-term tax protection under Prop 13 is preserved.
+Source: R&T Code Section 170 - CAL-001
+
+## CAL-002 | Calamity Relief | How is the calamity reduction calculated?
+The Assessor determines the value of the property in its damaged state as of the date of the calamity. The assessed value is temporarily reduced to that lower value. You continue paying taxes at the reduced value until the property is repaired or reconstructed. Once repairs are complete, the Assessor reassesses the property  -  but only restores it to the pre-damage base year value factored for inflation, not to current market value. This means a disaster does not reset your Prop 13 base year value upward.
+Source: R&T Code Section 170 - CAL-002
+
+## CAL-003 | Calamity Relief | Does rebuilding after a disaster trigger reassessment?
+Generally no  -  not if you rebuild to a similar size and use. Reconstruction that is comparable to what was there before is excluded from new construction reassessment under the calamity provisions. However, if you significantly expand the structure or change its use during reconstruction, the added value of those improvements may be assessed as new construction. Rebuilding like-for-like is safe; upgrading substantially is not.
+Source: R&T Code Section 170 - CAL-003
+
+## CAL-004 | Calamity Relief | Can I transfer my base year value to a replacement property after a disaster?
+Yes, under Proposition 19. If your primary residence was substantially damaged (more than 50% of improvement value) by a Governor-declared wildfire or natural disaster, you can transfer your base year value to a replacement home anywhere in California. There is no age requirement and no limit on the number of times this can be used. The replacement must be purchased or built within two years of the original property's sale. File form BOE-19-V with the County Assessor where the replacement is located.
+Source: BOE Publication 801 - CAL-004
+
+## NC-011 | New Construction Exclusions | What types of construction are excluded from reassessment?
+Several types of construction are excluded from new construction reassessment: active solar energy systems (excluded through January 1, 2027); improvements to accommodate disabled persons; seismic safety retrofits that do not add square footage; fire sprinkler systems and other fire safety improvements; and reconstruction after a calamity that restores the property to its pre-damage condition. In each case only the excluded work is protected  -  any additional improvements beyond the exclusion are assessed normally.
+Source: BOE Publication 150-D - NC-011
+
+## NC-012 | New Construction Exclusions | Does adding a swimming pool or landscaping trigger reassessment?
+Yes. Swimming pools, spas, permanent outdoor structures, and significant hardscape improvements are considered new construction and will be assessed at their added market value. Basic landscaping such as planting grass or shrubs generally does not trigger reassessment, but permanent improvements that add lasting value to the property  -  retaining walls, irrigation systems, outdoor kitchens, sport courts  -  typically do. The Assessor evaluates each improvement individually.
+Source: BOE Publication 150-D - NC-012
+
+## NC-013 | New Construction | What is a notice of completion and why does it matter?
+A notice of completion is a legal document recorded with the county recorder when construction is finished. It officially marks the completion date of new construction for property tax purposes. The Assessor uses this date  -  or the date of substantial completion if no notice is recorded  -  to determine when to assess the new construction. The assessed value is added to the roll as of January 1 following completion, or as of the completion date if it occurs after the lien date.
+Source: BOE Publication 150-D - NC-013
+
+## ESC-001 | Escape Assessments | What is an escape assessment?
+An escape assessment is a retroactive property tax assessment issued when the Assessor discovers that a taxable event  -  such as a Change in Ownership or new construction  -  was missed and not assessed in a prior year. The Assessor can go back up to four years to issue an escape assessment. You will receive a notice and a separate bill for the escaped taxes, plus interest at 0.5% per month from the date the taxes should have been due.
+Source: BOE Publication 29 - ESC-001
+
+## ESC-002 | Escape Assessments | I received an escape assessment for prior years. Is that legal?
+Yes. California law allows the Assessor to issue escape assessments for up to four prior fiscal years when a reassessment event was not captured at the time. Common causes include unreported changes in ownership, unpermitted construction discovered during a sale or permit pull, and clerical errors. The four-year lookback period runs from the fiscal year in which the event occurred. You have the right to appeal an escape assessment  -  the deadline is 60 days from the date of the escape assessment notice.
+Source: BOE Publication 29 - ESC-002
+
+## ESC-003 | Escape Assessments | Can I appeal an escape assessment?
+Yes. You have 60 days from the date of the escape assessment notice to file an appeal with the Assessment Appeals Board. The grounds are the same as a regular appeal  -  you are contesting the value assigned. You must continue paying the escaped taxes during the appeal to avoid additional penalties. If your appeal succeeds, you receive a refund with interest for any overpayment.
+Source: BOE Publication 30 - ESC-003
+
+## MH-001 | Mobilehomes | How are mobilehomes assessed for property taxes?
+It depends on whether the mobilehome is on a permanent foundation. A mobilehome on a permanent foundation is treated as real property and assessed like any other home  -  subject to Prop 13, with a base year value set at purchase and annual increases capped at 2%. A mobilehome not on a permanent foundation is typically assessed as personal property and taxed under the vehicle license fee system through the DMV, not through the county property tax system.
+Source: BOE Publication 10 - MH-001
+
+## MH-002 | Mobilehomes | I bought a mobilehome in a park. Will I get a property tax bill?
+It depends on how the mobilehome is titled. If it is on a permanent foundation and has been converted to real property (via a process called "de-titling"), yes  -  you will receive a county property tax bill. If it is still titled as a vehicle with the DMV, you pay an annual license fee to the DMV instead of a property tax bill. Many mobilehomes in parks are still on the DMV system. Check your title documents or ask the park manager.
+Source: BOE Publication 10 - MH-002
+
+## MH-003 | Mobilehomes | Does buying a mobilehome trigger a Change in Ownership reassessment?
+Yes, if the mobilehome is assessed as real property on the county roll. The purchase triggers a Change in Ownership and the Assessor will set a new base year value based on the purchase price, just like any other real property sale. All the same Prop 13 rules, exclusions, and supplemental assessment rules apply. If the mobilehome is on the DMV system, the county assessor is not involved.
+Source: BOE Publication 10 - MH-003
+
+## ADDR-001 | Address Changes | How do I update my mailing address for property tax bills?
+You must notify your county Assessor's office in writing of any mailing address change. Most counties have an address change request form available on the Assessor's website or at the office. Failure to update your address means tax bills and important notices  -  including reassessment notices and appeal deadlines  -  will go to the wrong address. Missing a bill or notice due to an outdated address does not excuse late payment penalties or missed appeal deadlines.
+Source: R&T Code Section 615 - ADDR-001
+
+## ADDR-002 | Address Changes | I never received my tax bill. Do I still owe the taxes?
+Yes. California law places the responsibility for paying property taxes on the property owner regardless of whether a bill was received. If you did not receive a bill, contact your county Treasurer-Tax Collector to request a duplicate. Non-receipt of a tax bill is not grounds for penalty cancellation  -  you are still responsible for knowing when taxes are due and paying on time.
+Source: R&T Code Section 2610.5 - ADDR-002
+
+## APN-001 | Assessor Parcel Number | What is an Assessor Parcel Number (APN)?
+An Assessor Parcel Number (APN) is a unique identification number assigned by the county Assessor to every parcel of land for assessment and taxation purposes. It typically appears on your property tax bill, deed, and assessment notices. The APN is used to look up your property's assessed value, tax history, and ownership information in county records. If you are unsure of your APN, you can usually find it by searching your property address on the Assessor's website.
+Source: BOE Publication 29 - APN-001
+
+## APN-002 | Assessor Parcel Number | Is an Assessor parcel the same as a legal lot?
+Not necessarily. The Assessor creates parcels for valuation and taxation purposes, which usually match legal lot boundaries -- but not always. A single legal lot may have multiple APNs, or an APN may not correspond to a buildable parcel. Never assume an APN represents a legal, buildable lot without checking with your county or city planning department.
+Source: BOE Publication 29 - APN-002
+
+## LIEN-001 | Lien Date | What is the lien date and why does it matter?
+The lien date is January 1 of each year -- the date on which all taxable property is assessed and property taxes become a lien against the property. Your property's value is determined as of this date, and ownership as of this date determines who is responsible for that year's taxes. Even if you sell the property after January 1, the taxes for that fiscal year are based on the January 1 value and ownership.
+Source: R&T Code Section 2192 - LIEN-001
+
+## LIEN-002 | Lien Date | I sold my boat or business equipment after January 1. Do I still owe the taxes?
+Yes. If you owned taxable personal property -- such as a boat, aircraft, or business equipment -- as of January 1 (the lien date), you are liable for the property taxes for that fiscal year even if you sell the property shortly afterward. Tax liability is established at the lien date. Any agreement to have the buyer reimburse you is a private matter between buyer and seller.
+Source: R&T Code Section 2192 - LIEN-002
+
+## BILL-011 | Billing and Payments | My bill shows "Improvements." Does that mean someone made changes to my property?
+No. On a property tax bill, "Improvements" is a technical term that refers to anything on the land -- structures, buildings, and other fixtures -- as opposed to the land itself. It does not mean improvements were made in the past year. Your bill separates assessed value into two components: Land and Improvements. Both are added together to get your total assessed value.
+Source: BOE Publication 29 - BILL-011
+
+## BPP-001 | Business Personal Property | What is business personal property and is it taxable?
+Yes. In California, business personal property -- equipment, machinery, computers, furniture, and supplies used in a business -- is taxable and assessed annually by the county Assessor. Unlike real property, business personal property does not benefit from Prop 13's 2% annual cap. It is assessed at its current market value each year as of January 1, the lien date.
+Source: R&T Code Section 441 - BPP-001
+
+## BPP-002 | Business Personal Property | What is a Business Property Statement (Form 571-L)?
+The 571-L is an annual filing required of most businesses in California. It asks you to report the cost and acquisition year of all personal property used in your business as of January 1. The Assessor uses this information to determine the assessed value of your business personal property. Failure to file results in an estimated assessment plus a 10% penalty. If you are unsure how to complete the form, contact your county Assessor's office for assistance.
+Source: R&T Code Section 441 - BPP-002
+
+## BPP-003 | Business Personal Property | I received a 571-L but my business was not open on January 1. Do I still have to file?
+Yes. A business does not need to be open for its assets to be subject to assessment. If you owned taxable business personal property on January 1, it is assessable regardless of whether the business was actively operating. If the business is permanently closed, return the form with a note stating the closure date and what happened to the equipment.
+Source: R&T Code Section 441 - BPP-003
+
+## BOAT-001 | Boats and Vessels | Are boats subject to California property taxes?
+Yes. Unlike automobiles, boats are not assessed through the DMV registration fee system. Instead, they are assessed as personal property by the county Assessor where the boat is principally kept or documented. You will receive a property tax bill from the county, not through your boat registration. The Assessor may send you a Vessel Property Statement asking for condition, location, and ownership information.
+Source: R&T Code Section 227 - BOAT-001
+
+## BOAT-002 | Boats and Vessels | I received a Vessel Property Statement. What do I do?
+Complete and return it. The Assessor uses the statement to verify the boat's condition, location, and ownership as of January 1. If you do not return it, the Assessor will estimate the value using available data and add a 10% penalty for failure to file. If you sold the boat, note the sale date and new owner's information on the statement and return it.
+Source: R&T Code Section 463 - BOAT-002
+
+## PI-001 | Possessory Interest | What is a possessory interest?
+A possessory interest arises when a private party has a beneficial, exclusive use of publicly owned, tax-exempt property. Because the public land itself is not taxable, the private party's right to use it is assessed instead. Common examples include: a private marina on a public waterway, a concession stand at a public fairground, a cabin on federal forest land, a private company leasing space in a government building, and grazing rights on state or federal land. The possessory interest holder receives a property tax bill even though they do not own the underlying land.
+Source: R&T Code Section 107 - PI-001
+
+## WILL-001 | Williamson Act | What is the Williamson Act and how does it affect property taxes?
+The California Land Conservation Act of 1965 -- commonly called the Williamson Act -- allows landowners to voluntarily restrict their land to agricultural or open space use in exchange for a reduced assessed value. Instead of being assessed at market value, Williamson Act land is valued using a restricted income method, which typically results in significantly lower property taxes. The contract runs for a minimum of 10 years and renews automatically each year unless a notice of non-renewal is filed. Contact your county Assessor or Planning Department for details on enrollment.
+Source: Government Code Section 51200 - WILL-001
+
+## EXC-001 | Exemptions vs Exclusions | What is the difference between an exemption and an exclusion?
+An exemption reduces the taxable value of a property that would otherwise be fully assessable -- for example, the Homeowners Exemption reduces assessed value by $7,000. An exclusion prevents a reassessment event from triggering a new base year value -- for example, a transfer between spouses is excluded from Change in Ownership, so no reassessment occurs. Exemptions reduce the tax bill; exclusions prevent the taxable value from being reset upward.
+Source: BOE Publication 29 - EXC-001
+
+## APP-008 | Assessment Appeals | What should I bring to my assessment appeal hearing?
+Bring comparable sales data -- properties similar to yours that sold close to January 1 of the tax year, in the same area, with similar size and condition. A formal appraisal is also strong evidence. Organize your evidence clearly and be prepared to present it yourself. Both you and the Assessor's office will have an opportunity to present evidence and ask questions. The appeals board is not bound by either party's value -- they can reduce, increase, or leave the value unchanged.
+Source: BOE Publication 30 - APP-008
+
+## APP-009 | Assessment Appeals | What is an exchange of information in an appeal?
+Either party can request an exchange of information at least 30 days before the hearing. The requesting party provides their opinion of value and supporting data; the other party must respond at least 15 days before the hearing. Once an exchange occurs, evidence at the hearing is largely restricted to what was exchanged. This process helps both sides understand each other's position before the hearing and often leads to settlements without a full hearing.
+Source: BOE Publication 30 - APP-009
+
+## APP-010 | Assessment Appeals | What happens if I miss my appeal hearing?
+Your application will be denied for nonappearance and the appeal is closed. A denial notice will be mailed to you. In limited circumstances -- such as documented extraordinary events -- you may request reconsideration within 30 to 60 days of the denial notice. Simply forgetting the date or being unavailable generally does not qualify. Always notify the clerk of the board as soon as possible if you cannot appear.
+Source: BOE Publication 30 - APP-010
+
+## NC-014 | New Construction | I received a New Construction Cost Statement. What is it and what should I do?
+A New Construction Cost Statement is a form the Assessor sends when new construction has been identified on your property. It asks you to report construction costs, completion date, and other project details. Complete it accurately and return it promptly -- this information helps the Assessor determine the added value of the new construction. Include any supporting documentation such as building permits, contractor invoices, or photos. If a question does not apply, write N/A. Failure to return the form does not prevent assessment; the Assessor will estimate the value from available data.
+Source: BOE Publication 150-D - NC-014
+
+## NC-015 | New Construction | Why did I get a New Construction Cost Statement if I only did minor work?
+The Assessor issues Cost Statements whenever a building permit is pulled or new construction activity is identified, even for smaller projects. Not all permitted work results in a taxable assessment -- routine repairs and maintenance are excluded. The Cost Statement is the Assessor's tool to gather information and determine whether the work triggers an assessment. Completing and returning it accurately helps ensure you are not over-assessed.
+Source: BOE Publication 150-D - NC-015
+
+## NC-016 | New Construction | How long after I complete construction will I receive a tax bill for it?
+New construction is assessed as of the date it is substantially completed or the date of a change in ownership, whichever comes first. If completed before January 1, it is added to the annual roll for the upcoming fiscal year. If completed after January 1, a supplemental assessment is issued covering the period from completion through June 30. You may receive the supplemental bill several months after completion, depending on when the Assessor processes it. Building permits and recorded documents trigger the review process.
+Source: BOE Publication 150-D - NC-016
+"""
 
 def parse_knowledge_base(raw: str) -> list[dict]:
     chunks = []
@@ -404,12 +540,10 @@ def retrieve(query: str, chunks: list[dict], index: dict, top_k: int = 4) -> lis
     ranked = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)
     return [chunks[i] for i in ranked[:top_k] if scores[i] > 0]
 
-
 SYSTEM_BASE = """You are a California County Property Tax Assistant. You help property owners understand California property taxes using only the provided reference material.
 
 Rules:
 - Answer only from the REFERENCE MATERIAL below. Do not use outside knowledge.
-- Respond in plain prose only. Do not use markdown headers (##), bullet points, bold (**), or numbered lists in your answers.
 - Be clear and friendly. Define technical terms when you use them.
 - End every answer with the Source line from the matching reference entry.
 - If the question is outside the reference material, say so and direct the user to contact their county Assessor's office.
