@@ -1,6 +1,6 @@
 """
-SD County Property Tax Assistant - RAG Engine
-=============================================
+County Property Tax Assistant - RAG Engine
+==========================================
 Chunks the knowledge base, builds a TF-IDF vector index (no external
 embedding API needed), retrieves relevant chunks at query time, and
 calls Claude Haiku with only those chunks.
@@ -24,12 +24,12 @@ Source: BOE Publication 29 · P13-001
 Your base year value is the taxable value assigned to your property when it is purchased or when new construction is completed. For a purchase, it is generally equal to the sale price — provided the sale was an arm's-length transaction between an unrelated buyer and seller. The Assessor validates each sale; if the sale price reflects distressed conditions (foreclosure, short sale, auction, or a purchase from a family member or friend), the enrolled value may differ from what you paid. This becomes the starting point for your property taxes, and it can only increase by up to 2% per year going forward.
 Source: BOE Publication 29 · P13-002
 
-## P13-003 | Prop 13 Basics | What is the property tax rate in San Diego County?
+## P13-003 | Prop 13 Basics | What is the property tax rate in California?
 The base property tax rate in California is 1% of your property's assessed value. However, your total tax bill is typically higher than 1% because it also includes voter-approved charges such as school bonds, Mello-Roos special taxes, and other local assessments that vary by location.
-Source: SD County Treasurer-Tax Collector · P13-003
+Source: BOE Publication 29 · P13-003
 
 ## P13-004 | Prop 13 Basics | Why did my assessed value go up more than 2%?
-There are three reasons your assessed value could increase by more than 2%: (1) A Change in Ownership occurred, which triggers reassessment to current market value; (2) new construction was completed, which adds the market value of the new work; or (3) your property was previously under a Proposition 8 decline-in-value reduction, and as the market recovers, the assessed value can increase by more than 2% per year until it returns to the Prop 13 factored base year value. If none of these apply, contact the Assessor's office to review your account.
+There are three reasons your assessed value could increase by more than 2%: (1) A Change in Ownership occurred, which triggers reassessment to current market value; (2) new construction was completed, which adds the market value of the new work; or (3) your property was previously under a Proposition 8 decline-in-value reduction, and as the market recovers, the assessed value can increase by more than 2% per year until it returns to the Prop 13 factored base year value. If none of these apply, contact your county Assessor's office to review your account.
 Source: BOE Publication 29 · P13-004
 
 ## P13-005 | Prop 13 Basics | What triggers a reassessment to full market value?
@@ -85,11 +85,11 @@ A PCOR (form BOE-502-A) must be filed with the county recorder whenever real pro
 Source: BOE Publication 4 · CIO-010
 
 ## CIO-011 | Change in Ownership | Will my foreclosure or distressed sale price be my new assessed value?
-Not necessarily. While purchase price is generally presumed to equal market value in an arm's-length sale, the Assessor must validate each transaction. For foreclosures, short sales, auctions, REO purchases, and purchases from family members or friends, the sale price may not reflect open-market conditions — one or more elements of a fair market value transaction may be missing. In those cases the Assessor may enroll a value higher or lower than what you paid, based on an independent market analysis. If you believe the enrolled value is incorrect, you can request an informal review or file a formal appeal. Call the Assessor at (619) 236-3771.
+Not necessarily. While purchase price is generally presumed to equal market value in an arm's-length sale, the Assessor must validate each transaction. For foreclosures, short sales, auctions, REO purchases, and purchases from family members or friends, the sale price may not reflect open-market conditions — one or more elements of a fair market value transaction may be missing. In those cases the Assessor may enroll a value higher or lower than what you paid, based on an independent market analysis. If you believe the enrolled value is incorrect, you can request an informal review or file a formal appeal with your county Assessor's office.
 Source: BOE Property Tax Rule 2 · CIO-011
 
 ## RC-001 | Roll Corrections | There is an error on my assessment — can it be fixed?
-Yes. If there is a factual error on your assessment roll — such as a wrong property size, incorrect owner name, or a clerical mistake — the Assessor can correct it after the roll has been delivered to the Auditor, generally within four years of the assessment being made. Errors involving a decline in value that was not properly reflected must be corrected within one year. If a correction increases your taxes, the Assessor must notify you and explain the review process. If it decreases your taxes, the Board of Supervisors must consent. To report an error, contact the San Diego County Assessor at (619) 236-3771 or visit assessor.sandiegocounty.gov.
+Yes. If there is a factual error on your assessment roll — such as a wrong property size, incorrect owner name, or a clerical mistake — the Assessor can correct it after the roll has been delivered to the Auditor, generally within four years of the assessment being made. Errors involving a decline in value that was not properly reflected must be corrected within one year. If a correction increases your taxes, the Assessor must notify you and explain the review process. If it decreases your taxes, the Board of Supervisors must consent. To report an error, contact your county Assessor's office.
 Source: BOE Property Tax Rule 263 · RC-001
 
 ## NC-001 | New Construction | What counts as new construction for property tax purposes?
@@ -137,7 +137,7 @@ No. Your regular annual bill covers the full fiscal year and is typically paid t
 Source: BOE Publication 26 · SUP-006
 
 ## SUP-007 | Supplemental Assessments | What if my supplemental assessment is too high?
-You have the right to appeal. The deadline is 60 days from the date of the Notice of Supplemental Assessment — shorter than the regular roll appeal window. Contact the Assessment Appeals Board at (619) 531-5600.
+You have the right to appeal. The deadline is 60 days from the date of the Notice of Supplemental Assessment — shorter than the regular roll appeal window. Contact your county Assessment Appeals Board to file.
 Source: BOE Publication 26 · SUP-007
 
 ## EX-HO-001 | Homeowners Exemption | What is the Homeowners Exemption?
@@ -145,7 +145,7 @@ The Homeowners Exemption reduces your assessed value by $7,000, saving most home
 Source: BOE Publication 2 · EX-HO-001
 
 ## EX-HO-002 | Homeowners Exemption | How do I apply for the Homeowners Exemption?
-File form BOE-266 with the San Diego County Assessor's office. Filing by February 15 gives the full exemption. Filing between February 16 and December 10 gives 80% of the exemption for that year. The exemption renews automatically once granted.
+File form BOE-266 with your county Assessor's office. Filing by February 15 gives the full exemption. Filing between February 16 and December 10 gives 80% of the exemption for that year. The exemption renews automatically once granted.
 Source: BOE Publication 2 · EX-HO-002
 
 ## EX-HO-003 | Homeowners Exemption | Who qualifies?
@@ -169,7 +169,7 @@ Veterans honorably discharged with a 100% service-connected VA disability rating
 Source: BOE Publication 149 · EX-VET-DV-002
 
 ## EX-VET-DV-004 | Disabled Veterans Exemption | How do I apply?
-File form BOE-261-G with the San Diego County Assessor's office, along with your DD-214 and VA disability rating letter. For the low-income tier, include income documentation. Must be renewed annually by February 15.
+File form BOE-261-G with your county Assessor's office, along with your DD-214 and VA disability rating letter. For the low-income tier, include income documentation. Must be renewed annually by February 15.
 Source: BOE Publication 149 · EX-VET-DV-004
 
 ## EX-VET-DV-005 | Disabled Veterans Exemption | Does it need to be renewed every year?
@@ -181,24 +181,24 @@ Reduces assessed value by $4,000 (approx. $40/year savings). Available to vetera
 Source: BOE Publication 1 · EX-VET-B-001
 
 ## EX-VET-B-003 | Basic Veterans Exemption | How do I apply?
-File form BOE-261 with the San Diego County Assessor's office along with your DD-214. File by February 15 for the full exemption. Renews automatically once granted.
+File form BOE-261 with your county Assessor's office along with your DD-214. File by February 15 for the full exemption. Renews automatically once granted.
 Source: BOE Publication 1 · EX-VET-B-003
 
 ## BILL-001 | Billing and Payments | When are property tax bills mailed?
-San Diego County property tax bills are mailed in late October, covering the full fiscal year July 1 through June 30.
-Source: SD County Treasurer-Tax Collector · BILL-001
+California county property tax bills are typically mailed in late October, covering the full fiscal year July 1 through June 30.
+Source: BOE Publication 29 · BILL-001
 
 ## BILL-002 | Billing and Payments | When are property taxes due?
 Two installments: First installment due November 1, delinquent after December 10. Second installment due February 1, delinquent after April 10. Both can be paid upfront if preferred.
-Source: SD County Treasurer-Tax Collector · BILL-002
+Source: BOE Publication 29 · BILL-002
 
 ## BILL-003 | Billing and Payments | What happens if I miss a deadline?
 A 10% penalty is added. If the second installment is not paid by June 30, the property becomes tax-defaulted with an additional $33 redemption fee. After five years of non-payment, the property may be subject to the county tax sale process.
-Source: SD County Treasurer-Tax Collector · BILL-003
+Source: BOE Publication 29 · BILL-003
 
 ## BILL-004 | Billing and Payments | How can I pay my property taxes?
-Online at sdttc.com (free e-check, or credit/debit card with convenience fee), by phone, by mail, or in person at 1600 Pacific Highway, Room 162, San Diego, CA 92101. Call (877) 829-4732.
-Source: SD County Treasurer-Tax Collector · BILL-004
+Online, by phone, by mail, or in person at your county Tax Collector's office. Check your county Tax Collector's website for specific payment options, addresses, and contact information.
+Source: BOE Publication 29 · BILL-004
 
 ## BILL-009 | Billing and Payments | What is Mello-Roos?
 Mello-Roos is a special tax for properties within a Community Facilities District (CFD), funding infrastructure like schools and roads. It appears as a separate line item on your bill and is not based on assessed value.
@@ -206,7 +206,7 @@ Source: BOE Publication 29 · BILL-009
 
 ## BILL-010 | Billing and Payments | Can I get a penalty waived?
 Only in very limited circumstances: documented medical emergency, natural disaster, or county error. Financial hardship alone is not sufficient. You must pay the full amount including penalty first, then submit a penalty cancellation request with documentation to the Treasurer-Tax Collector.
-Source: SD County Treasurer-Tax Collector · BILL-010
+Source: BOE Publication 29 · BILL-010
 
 ## APP-001 | Assessment Appeals | What is an assessment appeal?
 A formal process to challenge the assessed value assigned to your property. If you believe your assessed value exceeds market value, you can appeal to the Assessment Appeals Board — an independent body separate from the Assessor. A successful appeal can reduce your taxes.
@@ -221,8 +221,8 @@ Regular roll: July 2 through November 30 of the assessment year. Supplemental as
 Source: BOE Publication 30 · APP-003
 
 ## APP-004 | Assessment Appeals | How do I file an appeal?
-Submit an Application for Changed Assessment to the San Diego County Clerk of the Board of Supervisors. There is a filing fee. You must continue paying taxes on time during the appeal to avoid penalties. Contact (619) 531-5600.
-Source: SD County Clerk of the Board · APP-004
+Submit an Application for Changed Assessment to your county Clerk of the Board of Supervisors. There is typically a filing fee. You must continue paying taxes on time during the appeal to avoid penalties. Contact your county Assessment Appeals Board for local filing instructions.
+Source: BOE Publication 30 · APP-004
 
 ## APP-007 | Assessment Appeals | Do I keep paying taxes while my appeal is pending?
 Yes. Filing an appeal does not suspend your payment obligation. If your appeal succeeds and the assessed value is reduced, you will receive a refund for any overpayment, with interest in some cases.
@@ -233,7 +233,7 @@ If your property's current market value falls below its Prop 13 factored base ye
 Source: BOE Publication 9 · P8-001
 
 ## P8-002 | Prop 8 Reductions | How do I request a Prop 8 decline in value review?
-If you believe your property's market value as of January 1 is lower than your current assessed value, contact the San Diego County Assessor's office to request an informal review. San Diego County has a Decline in Value review form available online. You must request a review for the current assessment year only — you cannot apply retroactively for prior years. Call the Assessor at (619) 236-3771 or visit assessor.sandiegocounty.gov.
+If you believe your property's market value as of January 1 is lower than your current assessed value, contact your county Assessor's office to request an informal review. Most counties have a Decline in Value review form available online or at the office. You must request a review for the current assessment year only — you cannot apply retroactively for prior years.
 Source: BOE Publication 800-10 · P8-002
 
 ## P8-003 | Prop 8 Reductions | What evidence supports a Prop 8 review?
@@ -249,7 +249,7 @@ Yes. The standard 2% annual cap applies only when enrolled at the factored base 
 Source: BOE Publication 800-10 · P8-005
 
 ## P8-006 | Prop 8 Reductions | Can I formally appeal a Prop 8 determination?
-If the Assessor disagrees with your position on market value, file a formal Assessment Appeal with the Assessment Appeals Board. For a regular roll value, the filing window is July 2 through November 30. You must continue paying taxes during the appeal. If successful, you receive a refund for the overpaid amount. Contact the Clerk of the Board at (619) 531-5600 or file at clerkoftheboard.sdcounty.ca.gov.
+If the Assessor disagrees with your position on market value, file a formal Assessment Appeal with your county Assessment Appeals Board. For a regular roll value, the filing window is July 2 through November 30. You must continue paying taxes during the appeal. If successful, you receive a refund for the overpaid amount.
 Source: BOE Publication 800-10 · P8-006
 
 ## P19-001 | Proposition 19 | What is Proposition 19?
@@ -269,7 +269,7 @@ Example: Parent's factored base year value is $300,000. Market value at transfer
 Source: BOE Publication 801 · P19-004
 
 ## P19-005 | Proposition 19 | Parent-child exclusion — how to apply and deadlines
-File form BOE-19-P with the County Assessor where the property is located. File within three years of the transfer date, or within six months of a supplemental or escape assessment notice. The child must also file for the Homeowners Exemption (BOE-266) or Disabled Veterans Exemption (BOE-261-G) within one year of the transfer date to receive the exclusion retroactive to the date of transfer. If the exemption is filed after one year, the exclusion only applies going forward. Contact the Assessor at (619) 236-3771.
+File form BOE-19-P with the County Assessor where the property is located. File within three years of the transfer date, or within six months of a supplemental or escape assessment notice. The child must also file for the Homeowners Exemption (BOE-266) or Disabled Veterans Exemption (BOE-261-G) within one year of the transfer date to receive the exclusion retroactive to the date of transfer. If the exemption is filed after one year, the exclusion only applies going forward. Contact your county Assessor's office for assistance.
 Source: BOE Publication 800-1 · P19-005
 
 ## P19-006 | Proposition 19 | Grandparent-grandchild exclusion
@@ -297,7 +297,7 @@ Before Prop 19, parents could transfer both their primary residence and up to $1
 Source: BOE Publication 800-1 · P19-011
 
 ## P19-012 | Proposition 19 | I inherited my parent's house — what do I need to do and when?
-Time is critical. The date of death is the date of Change in Ownership — even if the property is still in trust or probate. You have one year from the date of death to move in and file for the Homeowners or Disabled Veterans Exemption to get the exclusion retroactive to the date of death. File form BOE-19-P within three years of the date of death. Also file form BOE-502-D (Change in Ownership Statement — Death of Real Property Owner) within 150 days of death. Call the Assessor at (619) 236-3771 as soon as possible.
+Time is critical. The date of death is the date of Change in Ownership — even if the property is still in trust or probate. You have one year from the date of death to move in and file for the Homeowners or Disabled Veterans Exemption to get the exclusion retroactive to the date of death. File form BOE-19-P within three years of the date of death. Also file form BOE-502-D (Change in Ownership Statement — Death of Real Property Owner) within 150 days of death. Contact your county Assessor's office as soon as possible.
 Source: BOE Publication 800-9 · P19-012
 
 ## P19-013 | Proposition 19 | Can I buy my replacement home before I sell my original?
@@ -333,7 +333,7 @@ The California State Controller offers a Property Tax Postponement Program for h
 Source: BOE Publication 800-5 · SR-001
 
 ## SR-002 | Senior Assistance | Payment plan for delinquent property taxes
-If property taxes have been delinquent for less than five years, the County Tax Collector offers a five-year Permanent Installment Plan. At enrollment, pay 20% of the outstanding amount plus a processing fee; the remaining 80% is paid in equal installments over four years. Interest accrues at 1.5% per month (18% per year) on the unpaid balance. You must stay current on future annual tax bills to remain in good standing. Contact the Treasurer-Tax Collector at (877) 829-4732.
+If property taxes have been delinquent for less than five years, the County Tax Collector typically offers a five-year Permanent Installment Plan. At enrollment, pay 20% of the outstanding amount plus a processing fee; the remaining 80% is paid in equal installments over four years. Interest accrues at 1.5% per month (18% per year) on the unpaid balance. You must stay current on future annual tax bills to remain in good standing. Contact your county Treasurer-Tax Collector for details.
 Source: BOE Publication 800-5 · SR-002
 """
 
@@ -405,15 +405,15 @@ def retrieve(query: str, chunks: list[dict], index: dict, top_k: int = 4) -> lis
     return [chunks[i] for i in ranked[:top_k] if scores[i] > 0]
 
 
-SYSTEM_BASE = """You are the San Diego County Property Tax Assistant. You help residents understand property taxes using only the provided reference material.
+SYSTEM_BASE = """You are a California County Property Tax Assistant. You help property owners understand California property taxes using only the provided reference material.
 
 Rules:
 - Answer only from the REFERENCE MATERIAL below. Do not use outside knowledge.
 - Be clear and friendly. Define technical terms when you use them.
 - End every answer with the Source line from the matching reference entry.
-- If the question is outside the reference material, say so and direct the user to call the Assessor's office at (619) 236-3771.
+- If the question is outside the reference material, say so and direct the user to contact their county Assessor's office.
 - Never guess. If unsure, escalate to the office.
-- Do not answer questions unrelated to San Diego County property taxes."""
+- Do not answer questions unrelated to California property taxes."""
 
 def build_system_prompt(retrieved_chunks: list[dict]) -> str:
     if not retrieved_chunks:
@@ -434,7 +434,7 @@ def chat():
     history = []
 
     print(f"\nLoaded {len(chunks)} knowledge base chunks.")
-    print("SD County Property Tax Assistant (RAG mode)")
+    print("California County Property Tax Assistant (RAG mode)")
     print("Model: claude-haiku-4-5  |  Type 'quit' to exit\n")
     print("-" * 60)
 
