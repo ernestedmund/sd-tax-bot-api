@@ -40,12 +40,10 @@ from rag_engine import (
 # Setup
 # ---------------------------------------------------------------------------
 
-app = FastAPI(title="County Property Tax Assistant")
+app = FastAPI(title="SD County Property Tax Assistant")
 
 ALLOWED_ORIGINS = [
     "https://ernestedmund.github.io",
-    "https://propertytaxfaq.com",
-    "https://www.propertytaxfaq.com",
     "http://localhost:8080",
 ]
 
@@ -81,7 +79,7 @@ def check_rate_limit(ip: str):
     if len(ip_request_log[ip]) >= RATE_LIMIT_MAX:
         raise HTTPException(
             status_code=429,
-            detail="Rate limit reached. Please try again later or contact your county assessor's office."
+            detail="Rate limit reached. Please try again later or call (619) 236-3771."
         )
     ip_request_log[ip].append(now)
 
@@ -121,6 +119,14 @@ You are answering a phone call, so follow these rules strictly:
 - Never end with a standalone closing sentence. Instead, trail your final answer sentence into an invitation for more questions using a comma and a short tag like "...or let me know if you have another question" or "...or feel free to ask anything else."
 """
 
+SMS_SYSTEM_ADDENDUM = """
+You are answering an SMS text message, so follow these rules strictly:
+- Respond in plain text only. No markdown, bullet points, headers, or bold text.
+- Keep your answer to 2 to 3 short sentences. The person is reading on a phone screen.
+- Never include source citations, rule numbers, or form names.
+- End with a short invitation like "Reply with any other questions."
+"""
+
 EXPANSION_PROMPT = """You are a query rewriter for a property tax assistant.
 Given a conversation history and a short follow-up message, rewrite the follow-up as a single clear, standalone question that captures the user's full intent.
 Output ONLY the rewritten question -- no explanation, no preamble."""
@@ -145,16 +151,18 @@ def expand_query(message: str, history: list[dict]) -> str:
         }]
     )
     expanded = response.content[0].text.strip()
-    print(f"[query expansion] '{message}' -> '{expanded}'")
+    # print(f"[query expansion] '{message}' -> '{expanded}'")
     return expanded if expanded else message
 
 
-def get_rag_reply(message: str, history: list[dict], voice: bool = False) -> tuple[str, list[str]]:
+def get_rag_reply(message: str, history: list[dict], voice: bool = False, sms: bool = False) -> tuple[str, list[str]]:
     retrieval_query = expand_query(message, history)
     retrieved = retrieve(retrieval_query, KB_CHUNKS, KB_INDEX, top_k=4)
     system_prompt = build_system_prompt(retrieved)
     if voice:
         system_prompt = system_prompt + VOICE_SYSTEM_ADDENDUM
+    elif sms:
+        system_prompt = system_prompt + SMS_SYSTEM_ADDENDUM
     chunk_ids = [c["id"] for c in retrieved]
 
     trimmed_history = history[-(MAX_HISTORY_TURNS * 2):]
@@ -162,7 +170,7 @@ def get_rag_reply(message: str, history: list[dict], voice: bool = False) -> tup
 
     response = client.messages.create(
         model="claude-haiku-4-5-20251001",
-        max_tokens=300 if voice else 600,
+        max_tokens=300 if (voice or sms) else 600,
         system=system_prompt,
         messages=trimmed_history,
     )
@@ -211,11 +219,11 @@ LEGACY_VOICE = "Google.en-US-Chirp3-HD-Leda"
 GATHER_TIMEOUT = 5
 GATHER_SPEECH_TIMEOUT = "auto"
 GREETING_LEGACY = (
-    "Hi, you've reached the County Property Tax Assistant. "
+    "Hi, you've reached the San Diego County Property Tax Assistant. "
     "What's your property tax question?"
 )
 NO_INPUT = "I didn't catch that. Go ahead and ask your question."
-TRANSFER_NUMBER = ""  # Set to your county assessor's number
+TRANSFER_NUMBER = "+16192363771"
 
 
 def twiml_response(twiml: VoiceResponse) -> Response:
@@ -274,14 +282,14 @@ async def gather_handler(request: Request):
     history = sessions.get(call_sid, [])
     try:
         reply, chunk_ids = get_rag_reply(speech_result, history, voice=True)
-        print(f"[legacy {call_sid}] Q: {speech_result[:80]}")
-        print(f"[legacy {call_sid}] Chunks: {chunk_ids}")
-        print(f"[legacy {call_sid}] A: {reply[:120]}")
+        # print(f"[legacy {call_sid}] Q: {speech_result[:80]}")
+        # print(f"[legacy {call_sid}] Chunks: {chunk_ids}")
+        # print(f"[legacy {call_sid}] A: {reply[:120]}")
     except Exception as e:
         print(f"[legacy {call_sid}] Error: {e}")
         reply = (
             "I'm sorry, I had trouble looking that up. "
-            "Please contact your county assessor's office directly for assistance."
+            "Please call the Assessor's office directly at 619-236-3771."
         )
 
     updated_history = history + [
@@ -306,6 +314,47 @@ async def gather_handler(request: Request):
 
 
 # ---------------------------------------------------------------------------
+# Endpoints -- SMS
+# ---------------------------------------------------------------------------
+
+@app.post("/sms")
+async def sms_handler(request: Request):
+    """
+    Twilio SMS webhook. Incoming text -> RAG + Claude -> TwiML MessagingResponse.
+    Set Twilio phone number Messaging webhook to POST /sms.
+    """
+    form = await request.form()
+    body = (form.get("Body") or "").strip()
+    from_number = form.get("From", "unknown")
+
+    # Use From number as session key so conversation history persists per caller
+    session_key = f"sms_{from_number}"
+    history = sessions.get(session_key, [])
+
+    if not body:
+        reply = "Hi! Text me a property tax question and I'll do my best to help."
+    else:
+        # print(f"[sms {from_number}] Q: {body[:80]}")
+        try:
+            reply, chunk_ids = get_rag_reply(body, history, sms=True)
+            # print(f"[sms {from_number}] Chunks: {chunk_ids}")
+            # print(f"[sms {from_number}] A: {reply[:120]}")
+            sessions[session_key] = (history + [
+                {"role": "user", "content": body},
+                {"role": "assistant", "content": reply},
+            ])[-(MAX_HISTORY_TURNS * 2):]
+        except Exception as e:
+            print(f"[sms {from_number}] Error: {e}")
+            reply = "Sorry, I had trouble with that. Please try again or call the Assessor's office directly."
+
+    if len(reply) > 1500:
+        reply = reply[:1497] + "..."
+
+    twiml = f'''<?xml version="1.0" encoding="UTF-8"?><Response><Message>{reply}</Message></Response>'''
+    return Response(content=twiml, media_type="application/xml")
+
+
+# ---------------------------------------------------------------------------
 # Endpoints -- ConversationRelay (ElevenLabs TTS via websocket)
 # ---------------------------------------------------------------------------
 
@@ -314,7 +363,7 @@ VOICE_SETTINGS = "0.9_0.75_0.75"   # speed_stability_similarity
 ELEVENLABS_VOICE = f"{ELEVENLABS_VOICE_ID}-{VOICE_SETTINGS}"
 
 GREETING_RELAY = (
-    "Hi, you've reached the County Property Tax Assistant. "
+    "Hi, you've reached the San Diego County Property Tax Assistant. "
     "What's your property tax question?"
 )
 
@@ -325,17 +374,17 @@ async def voice_relay(request: Request):
     ConversationRelay entry point. Returns TwiML that hands the call off
     to a websocket, which drives the live conversation with ElevenLabs TTS.
     """
-    print("[voice_relay] Incoming call received")
+    # print("[voice_relay] Incoming call received")
     form = await request.form()
     call_sid = form.get("CallSid", "unknown")
-    print(f"[voice_relay] CallSid={call_sid}")
+    # print(f"[voice_relay] CallSid={call_sid}")
     sessions.pop(call_sid, None)
 
     # Railway automatically sets RAILWAY_PUBLIC_DOMAIN — use it for the websocket URL
     # so Twilio gets the correct public hostname, not an internal Railway address
     host = os.environ.get("RAILWAY_PUBLIC_DOMAIN") or request.headers.get("host", "")
     ws_url = f"wss://{host}/ws"
-    print(f"[relay] WebSocket URL: {ws_url}")
+    # print(f"[relay] WebSocket URL: {ws_url}")
 
     vr = VoiceResponse()
     connect = Connect()
@@ -380,29 +429,30 @@ async def websocket_handler(websocket: WebSocket):
             event = msg.get("type") or msg.get("event", "")
 
             # Debug: log every incoming message so we can see exact field names
-            print(f"[relay debug] event='{event}' keys={list(msg.keys())} raw={json.dumps(msg)[:400]}")
+            # print(f"[relay debug] event='{event}' keys={list(msg.keys())} raw={json.dumps(msg)[:400]}")
 
             if event == "setup":
                 call_sid = msg.get("callSid") or msg.get("CallSid", "unknown")
-                print(f"[relay] Connected: {call_sid}")
+                # print(f"[relay] Connected: {call_sid}")
 
             elif event == "prompt":
                 utterance = (msg.get("voicePrompt") or msg.get("speech", "") or msg.get("text", "")).strip()
                 if not utterance:
                     continue
 
-                print(f"[relay {call_sid}] Q: {utterance[:80]}")
+                # print(f"[relay {call_sid}] Q: {utterance[:80]}")
                 history = sessions.get(call_sid, [])
 
                 try:
                     reply, chunk_ids = get_rag_reply(utterance, history, voice=True)
-                    print(f"[relay {call_sid}] Chunks: {chunk_ids}")
-                    print(f"[relay {call_sid}] A: {reply[:120]}")
+                    # print(f"[relay {call_sid}] Chunks: {chunk_ids}")
+                    # print(f"[relay {call_sid}] A: {reply[:120]}")
                 except Exception as e:
                     print(f"[relay {call_sid}] RAG error: {e}")
                     reply = (
                         "I'm sorry, I had trouble looking that up. "
-                        "Please contact your county assessor's office directly for assistance."
+                        "Please call the Assessor's office directly at "
+                        "619-236-3771."
                     )
 
                 sessions[call_sid] = (history + [
@@ -423,9 +473,9 @@ async def websocket_handler(websocket: WebSocket):
                     await websocket.send_text(json.dumps({"type": "end"}))
 
             elif event == "interrupt":
-                print(f"[relay {call_sid}] Interrupted")
+                pass  # interrupt received, no action needed
 
     except WebSocketDisconnect:
-        print(f"[relay {call_sid}] Disconnected")
+        pass  # client disconnected normally
     except Exception as e:
         print(f"[relay {call_sid}] Error: {e}")
