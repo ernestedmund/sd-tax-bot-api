@@ -441,7 +441,7 @@ Source: R&T Code Section 463 - BOAT-002
 A possessory interest arises when a private party has a beneficial, exclusive use of publicly owned, tax-exempt property. Because the public land itself is not taxable, the private party's right to use it is assessed instead. Common examples include: a private marina on a public waterway, a concession stand at a public fairground, a cabin on federal forest land, a private company leasing space in a government building, and grazing rights on state or federal land. The possessory interest holder receives a property tax bill even though they do not own the underlying land.
 Source: R&T Code Section 107 - PI-001
 
-## WILL-001 | Williamson Act | What is the Williamson Act and how does it affect property taxes?
+## WILL-001 | Williamson Act | What is the Williamson Act and how does it affect property taxes? Is there tax relief for farmland or agricultural property?
 The California Land Conservation Act of 1965 -- commonly called the Williamson Act -- allows landowners to voluntarily restrict their land to agricultural or open space use in exchange for a reduced assessed value. Instead of being assessed at market value, Williamson Act land is valued using a restricted income method, which typically results in significantly lower property taxes. The contract runs for a minimum of 10 years and renews automatically each year unless a notice of non-renewal is filed. Contact your county Assessor or Planning Department for details on enrollment.
 Source: Government Code Section 51200 - WILL-001
 
