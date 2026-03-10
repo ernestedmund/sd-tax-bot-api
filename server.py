@@ -44,6 +44,8 @@ app = FastAPI(title="County Property Tax Assistant")
 
 ALLOWED_ORIGINS = [
     "https://ernestedmund.github.io",
+    "https://propertytaxfaq.com",
+    "https://www.propertytaxfaq.com",
     "http://localhost:8080",
 ]
 
