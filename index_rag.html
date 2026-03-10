@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>San Diego County Assessor — Property Tax Assistant</title>
+<title>California Property Tax Assistant</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -84,8 +84,8 @@
   <div class="header-inner">
     <div class="seal">&#9878;&#65039;</div>
     <div class="header-text">
-      <h1>San Diego County Property Tax Assistant</h1>
-      <p>Assessor / Recorder / County Clerk</p>
+      <h1>California Property Tax Assistant</h1>
+      <p>California County Assessor</p>
     </div>
     <div class="status-pill"><div class="status-dot"></div>Available</div>
   </div>
@@ -108,7 +108,7 @@
       <div class="msg bot">
         <div class="avatar">&#9878;&#65039;</div>
         <div class="bubble">
-          <strong>Hello! I'm the San Diego County Property Tax Assistant.</strong><br><br>
+          <strong>Hello! I'm the California Property Tax Assistant.</strong><br><br>
           I can answer questions about Proposition 13, assessed values, exemptions, supplemental bills, payment deadlines, appeals, and more.<br><br>
           What can I help you with today?
         </div>
@@ -129,7 +129,7 @@
 
   <div class="disclaimer">
     <span>&#8505;&#65039;</span>
-    <span>This assistant provides general property tax information. It is not legal or tax advice. For questions about your specific property, contact the Assessor's office at <strong>(619) 236-3771</strong> or visit <strong>assessor.sandiegocounty.gov</strong>.</span>
+    <span>This assistant provides general California property tax information. It is not legal or tax advice. For questions about your specific property, contact your county Assessor's office directly.</span>
   </div>
 </main>
 
@@ -137,7 +137,7 @@
   // ---------------------------------------------------------------------------
   // CONFIG — change API_BASE to wherever you deploy the FastAPI server
   // ---------------------------------------------------------------------------
-  const API_BASE = 'https://sd-tax-bot-api.onrender.com';  // <- update this
+  const API_BASE = 'https://sd-tax-bot-api-production-30aa.up.railway.app';  // <- update to generic branch URL if separate
 
   // Generate a session ID once per page load (identifies conversation to server)
   const SESSION_ID = crypto.randomUUID();
@@ -243,7 +243,7 @@
       hideTyping();
 
       if (res.status === 429) {
-        addMessage('bot', "You've reached the question limit for this session. For more help, please call the Assessor's office at (619) 236-3771 or visit assessor.sandiegocounty.gov.");
+        addMessage('bot', "You've reached the question limit for this session. For more help, please contact your county Assessor's office directly.");
         return;
       }
 
@@ -256,7 +256,7 @@
 
     } catch (err) {
       hideTyping();
-      addMessage('bot', "I'm having trouble connecting right now. Please try again in a moment, or contact the Assessor's office directly at (619) 236-3771.");
+      addMessage('bot', "I'm having trouble connecting right now. Please try again in a moment, or contact your county Assessor's office directly.");
     } finally {
       sendBtn.disabled = false;
       inputEl.focus();
